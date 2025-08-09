@@ -1,5 +1,5 @@
 // Video to Spritesheet Generator Application
-class SpritesheetGenerator {
+export default class SpritesheetGenerator {
     constructor() {
         this.video = null;
         this.currentFile = null;
@@ -1089,13 +1089,3 @@ class SpritesheetGenerator {
     }
 }
 
-// Initialize the application when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM loaded, initializing SpritesheetGenerator');
-    try {
-        new SpritesheetGenerator();
-        console.log('SpritesheetGenerator initialized successfully');
-    } catch (error) {
-        console.error('Failed to initialize SpritesheetGenerator:', error);
-    }
-});
