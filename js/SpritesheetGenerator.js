@@ -1,5 +1,4 @@
-// Video to Spritesheet Generator Application
-export default class SpritesheetGenerator {
+class SpritesheetGenerator {
     constructor() {
         this.video = null;
         this.currentFile = null;
@@ -1089,3 +1088,4 @@ export default class SpritesheetGenerator {
     }
 }
 
+window.SpritesheetGenerator = SpritesheetGenerator;
