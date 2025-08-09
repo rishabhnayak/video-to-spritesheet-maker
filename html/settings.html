@@ -1,0 +1,129 @@
+            <section class="settings-section card" id="settingsSection">
+                <div class="card__body">
+                    <h2>3. Settings</h2>
+                    <p class="text-secondary" id="settingsHelp">Upload a video first to enable generation settings</p>
+                    <div class="settings-grid" id="settingsGrid">
+                        <div class="setting-group">
+                            <label class="form-label" for="fpsSlider">
+                                Frame Rate: <span id="fpsValue">30</span> FPS
+                            </label>
+                            <input type="range" id="fpsSlider" class="fps-slider" min="24" max="120" value="30" step="1">
+                            <div class="fps-range">
+                                <span>24</span>
+                                <span>120</span>
+                            </div>
+                        </div>
+
+             <!-- Add this after the FPS slider setting-group -->
+                        <div class="setting-group">
+                            <label class="form-label">Time Range</label>
+                            <div class="time-range-inputs">
+                                <div class="input-group">
+                                    <label class="input-label">Start Time (seconds)</label>
+                                    <input type="number" id="startTime" class="form-control" min="0" step="0.1" placeholder="0" value="0">
+                                </div>
+                                <div class="input-group">
+                                    <label class="input-label">End Time (seconds)</label>
+                                    <input type="number" id="endTime" class="form-control" min="0" step="0.1" placeholder="Auto">
+                                </div>
+                            </div>
+                            <div class="time-range-info">
+                                <small class="text-secondary" id="timeRangeInfo">Full video duration will be used</small>
+                            </div>
+                        </div>
+
+                        <div class="setting-group">
+                            <label class="form-label" for="resolutionSelect">Sprite Resolution</label>
+                            <select id="resolutionSelect" class="form-control">
+                                <option value="same">Same as video</option>
+                                <option value="64">64×64</option>
+                                <option value="128">128×128</option>
+                                <option value="256">256×256</option>
+                                <option value="512">512×512</option>
+                                <option value="1024">1024×1024</option>
+                                <option value="custom">Custom size</option>
+                            </select>
+                        </div>
+
+                        <div class="setting-group hidden" id="customResolutionGroup">
+                            <label class="form-label">Custom Resolution</label>
+                            <div class="custom-resolution-inputs">
+                                <div class="input-group">
+                                    <label class="input-label">Width</label>
+                                    <input type="number" id="customWidth" class="form-control" min="8" max="2048" placeholder="Auto">
+                                </div>
+                                <div class="input-group">
+                                    <label class="input-label">Height</label>
+                                    <input type="number" id="customHeight" class="form-control" min="8" max="2048" placeholder="Auto">
+                                </div>
+                            </div>
+                            <div class="aspect-ratio-info">
+                                <small class="text-secondary" id="aspectRatioInfo">Aspect ratio will be preserved</small>
+                            </div>
+                        </div>
+
+                        <div class="setting-group">
+                            <label class="form-label" for="gridModeSelect">Grid Layout</label>
+                            <select id="gridModeSelect" class="form-control">
+                                <option value="auto">Auto (optimal)</option>
+                                <option value="custom">Custom columns</option>
+                            </select>
+                        </div>
+
+                        <div class="setting-group hidden" id="customColumnsGroup">
+                            <label class="form-label" for="customColumns">Number of Columns</label>
+                            <input type="number" id="customColumns" class="form-control" min="1" max="20" value="4">
+                        </div>
+
+                        <div class="setting-group">
+                            <label class="form-label" for="filenameInput">Output Filename</label>
+                            <input type="text" id="filenameInput" class="form-control" placeholder="spritesheet" value="spritesheet">
+                        </div>
+
+                        <!-- Add this after the filename setting-group -->
+                        <div class="setting-group">
+                            <label class="form-label" for="compressionSlider">
+                                Compression Quality: <span id="compressionValue">95</span>%
+                            </label>
+                            <input type="range" id="compressionSlider" class="compression-slider" min="50" max="100" value="95" step="5">
+                            <div class="compression-range">
+                                <span>50% (Smaller)</span>
+                                <span>100% (Lossless)</span>
+                            </div>
+                            <div class="compression-info">
+                                <small class="text-secondary" id="compressionInfo">Higher quality = larger file size</small>
+                            </div>
+                        </div>
+
+                        <!-- Add format selection -->
+                        <div class="setting-group">
+                            <label class="form-label" for="formatSelect">Export Format</label>
+                            <select id="formatSelect" class="form-control">
+                                <option value="png">PNG (Best for sprites)</option>
+                                <option value="webp">WebP (Better compression)</option>
+                                <option value="jpeg">JPEG (Smallest, may blur)</option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <div class="generation-controls" id="generationControls">
+                        <button type="button" class="btn btn--primary btn--full-width" id="generateBtn" disabled>
+                            Generate Spritesheet
+                        </button>
+                        <button type="button" class="btn btn--secondary btn--full-width hidden" id="cancelBtn">
+                            Cancel Generation
+                        </button>
+                    </div>
+
+                    <div class="progress-container hidden" id="progressContainer">
+                        <div class="progress-info">
+                            <span>Extracting frames...</span>
+                            <span id="progressText">0%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>

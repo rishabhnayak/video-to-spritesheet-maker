@@ -1,0 +1,31 @@
+            <section class="preview-section card hidden" id="previewSection">
+                <div class="card__body">
+                    <h2>4. Spritesheet Preview</h2>
+                    <div class="spritesheet-info" id="spritesheetInfo">
+                        <div class="info-grid">
+                            <span>Frames: <strong id="frameCount">0</strong></span>
+                            <span>Grid Size: <strong id="gridSize">0×0</strong></span>
+                            <span>Full Size: <strong id="sheetSize">0×0</strong></span>
+                            <span>Preview Size: <strong id="previewSize">0×0</strong></span>
+                        </div>
+                    </div>
+                    <div class="preview-container">
+                        <div class="preview-controls">
+                            <button type="button" class="btn btn--sm" id="zoomInBtn">Zoom In</button>
+                            <button type="button" class="btn btn--sm" id="zoomOutBtn">Zoom Out</button>
+                            <button type="button" class="btn btn--sm" id="resetZoomBtn">Reset</button>
+                        </div>
+                        <div class="canvas-wrapper" id="canvasWrapper">
+                            <canvas id="previewCanvas"></canvas>
+                        </div>
+                    </div>
+                    <div class="export-controls">
+                        <button type="button" class="btn btn--primary btn--full-width" id="exportBtn">
+                            Export PNG (Full Resolution)
+                        </button>
+                        <div class="export-status hidden" id="exportStatus">
+                            <span class="status-text">Preparing download...</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
