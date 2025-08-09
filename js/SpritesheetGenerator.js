@@ -1,4 +1,3 @@
-// Video to Spritesheet Generator Application
 class SpritesheetGenerator {
     constructor() {
         this.video = null;
@@ -1088,6 +1087,5 @@ class SpritesheetGenerator {
         }, 5000);
     }
 }
-
 
 window.SpritesheetGenerator = SpritesheetGenerator;
