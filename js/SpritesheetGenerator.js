@@ -84,6 +84,9 @@ class SpritesheetGenerator {
         this.compressionInfo = document.getElementById('compressionInfo');
         this.formatSelect = document.getElementById('formatSelect');
 
+        // Background transparency toggle
+        this.transparentBgToggle = document.getElementById('transparentBgToggle');
+
     }
 
     setupEventListeners() {
@@ -232,6 +235,14 @@ class SpritesheetGenerator {
         if (this.formatSelect) {
             this.formatSelect.addEventListener('change', () => {
                 this.updateCompressionInfo();
+            });
+        }
+
+        if (this.transparentBgToggle) {
+            this.transparentBgToggle.addEventListener('change', () => {
+                if (this.spritesheet) {
+                    this.applyTransparencyToSpritesheet(this.transparentBgToggle.checked);
+                }
             });
         }
 
@@ -526,7 +537,8 @@ class SpritesheetGenerator {
             }
 
             this.spritesheet = spritesheets;
-            this.displaySpritesheet(spritesheets, settings);
+            this.applyTransparencyToSpritesheet(settings.transparentBackground);
+            this.displaySpritesheet(this.spritesheet, settings);
             this.hideGenerationProgress();
             this.showSuccess('Spritesheet generated successfully!');
 
@@ -587,7 +599,8 @@ class SpritesheetGenerator {
             filename: (this.filenameInput ? this.filenameInput.value : 'spritesheet') || 'spritesheet',
             // Add compression settings
             compressionQuality: parseInt(this.compressionSlider ? this.compressionSlider.value : 95),
-            exportFormat: this.formatSelect ? this.formatSelect.value : 'png'
+            exportFormat: this.formatSelect ? this.formatSelect.value : 'png',
+            transparentBackground: this.transparentBgToggle ? this.transparentBgToggle.checked : false
         };
     }
 
@@ -735,9 +748,22 @@ class SpritesheetGenerator {
             }
         }
 
+        // Clone original canvases for background processing
+        const originalFullCanvas = document.createElement('canvas');
+        originalFullCanvas.width = sheetWidth;
+        originalFullCanvas.height = sheetHeight;
+        originalFullCanvas.getContext('2d').drawImage(fullCanvas, 0, 0);
+
+        const originalPreviewCanvas = document.createElement('canvas');
+        originalPreviewCanvas.width = previewWidth;
+        originalPreviewCanvas.height = previewHeight;
+        originalPreviewCanvas.getContext('2d').drawImage(previewCanvas, 0, 0);
+
         return {
             fullCanvas,
             previewCanvas,
+            originalFullCanvas,
+            originalPreviewCanvas,
             columns,
             rows,
             frameCount,
@@ -785,6 +811,58 @@ class SpritesheetGenerator {
         if (this.previewSection) {
             this.previewSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
+    }
+
+    applyTransparencyToSpritesheet(enabled) {
+        if (!this.spritesheet) return;
+
+        const { originalFullCanvas, originalPreviewCanvas, fullCanvas, previewCanvas } = this.spritesheet;
+        const fullCtx = fullCanvas.getContext('2d');
+        const previewCtx = previewCanvas.getContext('2d');
+
+        // Reset from originals
+        fullCtx.clearRect(0, 0, fullCanvas.width, fullCanvas.height);
+        fullCtx.drawImage(originalFullCanvas, 0, 0);
+        previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
+        previewCtx.drawImage(originalPreviewCanvas, 0, 0);
+
+        if (enabled) {
+            this.makeBackgroundTransparent(fullCtx, fullCanvas.width, fullCanvas.height);
+            this.makeBackgroundTransparent(previewCtx, previewCanvas.width, previewCanvas.height);
+        }
+
+        if (this.previewCanvasEl) {
+            const ctx = this.previewCanvasEl.getContext('2d');
+            this.previewCanvasEl.width = previewCanvas.width;
+            this.previewCanvasEl.height = previewCanvas.height;
+            ctx.drawImage(previewCanvas, 0, 0);
+        }
+    }
+
+    makeBackgroundTransparent(ctx, width, height) {
+        const imageData = ctx.getImageData(0, 0, width, height);
+        const data = imageData.data;
+        const threshold = 10; // pure black cutoff
+        const softness = 40; // range for smooth edge fade
+        for (let i = 0; i < data.length; i += 4) {
+            const r = data[i];
+            const g = data[i + 1];
+            const b = data[i + 2];
+            const max = Math.max(r, g, b);
+
+            if (max <= threshold) {
+                data[i + 3] = 0;
+            } else if (max < threshold + softness) {
+                const alphaFactor = (max - threshold) / softness;
+                const newAlpha = alphaFactor * 255;
+                const scale = newAlpha > 0 ? 255 / newAlpha : 0;
+                data[i] = Math.min(255, r * scale);
+                data[i + 1] = Math.min(255, g * scale);
+                data[i + 2] = Math.min(255, b * scale);
+                data[i + 3] = newAlpha;
+            }
+        }
+        ctx.putImageData(imageData, 0, 0);
     }
 
     async seekToTime(video, time) {
