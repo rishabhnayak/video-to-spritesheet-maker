@@ -1089,13 +1089,5 @@ class SpritesheetGenerator {
     }
 }
 
-// Initialize the application when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM loaded, initializing SpritesheetGenerator');
-    try {
-        new SpritesheetGenerator();
-        console.log('SpritesheetGenerator initialized successfully');
-    } catch (error) {
-        console.error('Failed to initialize SpritesheetGenerator:', error);
-    }
-});
+
+window.SpritesheetGenerator = SpritesheetGenerator;

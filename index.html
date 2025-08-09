@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Video to Spritesheet Generator</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/components.css">
 </head>
 <body>
     <div class="container">
@@ -14,13 +15,12 @@
         </header>
 
         <main class="main">
-            <!-- Upload Section -->
             <section class="upload-section card">
                 <div class="card__body">
                     <h2>1. Upload Video</h2>
                     <div class="drop-zone" id="dropZone">
                         <div class="drop-zone__content">
-                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                                 <polyline points="14,2 14,8 20,8"></polyline>
                                 <line x1="16" y1="13" x2="8" y2="13"></line>
@@ -43,7 +43,6 @@
                 </div>
             </section>
 
-            <!-- Video Preview Section -->
             <section class="video-section card hidden" id="videoSection">
                 <div class="card__body">
                     <h2>2. Video Preview</h2>
@@ -62,7 +61,6 @@
                 </div>
             </section>
 
-            <!-- Settings Panel -->
             <section class="settings-section card" id="settingsSection">
                 <div class="card__body">
                     <h2>3. Settings</h2>
@@ -79,7 +77,6 @@
                             </div>
                         </div>
 
-             <!-- Add this after the FPS slider setting-group -->
                         <div class="setting-group">
                             <label class="form-label">Time Range</label>
                             <div class="time-range-inputs">
@@ -145,7 +142,6 @@
                             <input type="text" id="filenameInput" class="form-control" placeholder="spritesheet" value="spritesheet">
                         </div>
 
-                        <!-- Add this after the filename setting-group -->
                         <div class="setting-group">
                             <label class="form-label" for="compressionSlider">
                                 Compression Quality: <span id="compressionValue">95</span>%
@@ -160,7 +156,6 @@
                             </div>
                         </div>
 
-                        <!-- Add format selection -->
                         <div class="setting-group">
                             <label class="form-label" for="formatSelect">Export Format</label>
                             <select id="formatSelect" class="form-control">
@@ -169,7 +164,6 @@
                                 <option value="jpeg">JPEG (Smallest, may blur)</option>
                             </select>
                         </div>
-
                     </div>
 
                     <div class="generation-controls" id="generationControls">
@@ -193,10 +187,6 @@
                 </div>
             </section>
 
-
-
-
-            <!-- Preview Section -->
             <section class="preview-section card hidden" id="previewSection">
                 <div class="card__body">
                     <h2>4. Spritesheet Preview</h2>
@@ -231,6 +221,7 @@
         </main>
     </div>
 
-    <script src="app.js"></script>
+    <script src="js/SpritesheetGenerator.js"></script>
+    <script src="js/main.js"></script>
 </body>
 </html>
