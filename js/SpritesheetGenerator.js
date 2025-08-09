@@ -842,12 +842,25 @@ class SpritesheetGenerator {
     makeBackgroundTransparent(ctx, width, height) {
         const imageData = ctx.getImageData(0, 0, width, height);
         const data = imageData.data;
+        const threshold = 10; // pure black cutoff
+        const softness = 40; // range for smooth edge fade
+
         for (let i = 0; i < data.length; i += 4) {
             const r = data[i];
             const g = data[i + 1];
             const b = data[i + 2];
-            if (r < 10 && g < 10 && b < 10) {
+            const max = Math.max(r, g, b);
+
+            if (max <= threshold) {
                 data[i + 3] = 0;
+            } else if (max < threshold + softness) {
+                const alphaFactor = (max - threshold) / softness;
+                const newAlpha = alphaFactor * 255;
+                const scale = newAlpha > 0 ? 255 / newAlpha : 0;
+                data[i] = Math.min(255, r * scale);
+                data[i + 1] = Math.min(255, g * scale);
+                data[i + 2] = Math.min(255, b * scale);
+                data[i + 3] = newAlpha;
             }
         }
         ctx.putImageData(imageData, 0, 0);
