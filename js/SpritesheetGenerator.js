@@ -844,6 +844,7 @@ class SpritesheetGenerator {
         const data = imageData.data;
         const threshold = 10; // pure black cutoff
         const softness = 40; // range for smooth edge fade
+
         for (let i = 0; i < data.length; i += 4) {
             const r = data[i];
             const g = data[i + 1];
