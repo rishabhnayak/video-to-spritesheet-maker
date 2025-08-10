@@ -91,6 +91,14 @@ class SpritesheetGenerator {
         this.cropBtn = document.getElementById('cropBtn');
         this.cropPopup = document.getElementById('cropPopup');
         this.cropImage = document.getElementById('cropImage');
+        // If cropImage does not exist, create and append it to the cropContainer
+        if (!this.cropImage && this.cropContainer) {
+            this.cropImage = document.createElement('img');
+            this.cropImage.id = 'cropImage';
+            this.cropImage.style.maxWidth = '100%';
+            this.cropImage.style.display = 'block';
+            this.cropContainer.appendChild(this.cropImage);
+        }
         this.cropArea = document.getElementById('cropArea');
         this.cropContainer = document.getElementById('cropContainer');
         // If cropContainer does not exist, create and append it to cropPopup
