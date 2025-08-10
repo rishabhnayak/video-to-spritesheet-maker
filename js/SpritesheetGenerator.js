@@ -102,6 +102,10 @@ class SpritesheetGenerator {
         this.exportBtn = document.getElementById('exportBtn');
         this.exportStatus = document.getElementById('exportStatus');
 
+        // Layout columns
+        this.mainColumn = document.getElementById('mainColumn');
+        this.previewColumn = document.getElementById('previewColumn');
+
         // Crop overlay elements
         this.cropOverlay = document.getElementById('cropOverlay');
         this.cropCanvas = document.getElementById('cropCanvas');
@@ -552,6 +556,17 @@ class SpritesheetGenerator {
 
         console.log('Handling file:', file.name, file.type);
 
+        // Reset preview layout when selecting a new file
+        if (this.previewColumn) {
+            this.previewColumn.classList.add('hidden');
+        }
+        if (this.mainColumn) {
+            this.mainColumn.classList.remove('col-lg-6');
+        }
+        if (this.previewSection) {
+            this.previewSection.classList.add('hidden');
+        }
+
         if (!file.type.startsWith('video/')) {
             this.showError('Please select a valid video file');
             return;
@@ -954,9 +969,15 @@ class SpritesheetGenerator {
             ctx.drawImage(spritesheets.previewCanvas, 0, 0);
         }
 
-        // Show preview section
+        // Show preview section and layout
         if (this.previewSection) {
             this.previewSection.classList.remove('hidden');
+        }
+        if (this.previewColumn) {
+            this.previewColumn.classList.remove('hidden');
+        }
+        if (this.mainColumn) {
+            this.mainColumn.classList.add('col-lg-6');
         }
 
         if (this.cropBtn) {
