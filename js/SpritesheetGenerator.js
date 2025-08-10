@@ -17,6 +17,7 @@ class SpritesheetGenerator {
 
         // Cropping state
         this.isCropping = false;
+
         this.cropBoxData = null;
         this.isDraggingCrop = false;
         this.isResizingCrop = false;
@@ -24,6 +25,7 @@ class SpritesheetGenerator {
         this.dragStart = null;
         this.startBox = null;
         this.currentAspect = null;
+
         
         this.initializeElements();
         this.setupEventListeners();
@@ -95,8 +97,10 @@ class SpritesheetGenerator {
         // Crop overlay elements
         this.cropOverlay = document.getElementById('cropOverlay');
         this.cropCanvas = document.getElementById('cropCanvas');
+
         this.cropBox = document.getElementById('cropBox');
         this.cropRatioSelect = document.getElementById('cropRatio');
+
         this.confirmCropBtn = document.getElementById('confirmCropBtn');
         this.cancelCropBtn = document.getElementById('cancelCropBtn');
 
@@ -242,6 +246,7 @@ class SpritesheetGenerator {
             this.cropBtn.addEventListener('click', () => this.enableCropMode());
         }
 
+
         if (this.cropBox) {
             this.cropBox.addEventListener('mousedown', (e) => this.startCropInteraction(e));
         }
@@ -254,12 +259,14 @@ class SpritesheetGenerator {
             this.cropRatioSelect.addEventListener('change', () => this.updateCropAspect());
         }
 
+
         if (this.confirmCropBtn) {
             this.confirmCropBtn.addEventListener('click', () => this.confirmCropSelection());
         }
 
         if (this.cancelCropBtn) {
             this.cancelCropBtn.addEventListener('click', () => this.cancelCropSelection());
+
         }
 
         if (this.exportBtn) {
@@ -886,6 +893,7 @@ class SpritesheetGenerator {
 
 
     enableCropMode() {
+
         if (!this.extractedFrames.length) return;
         if (this.cropBtn) {
             this.cropBtn.disabled = true;
@@ -898,6 +906,7 @@ class SpritesheetGenerator {
                 const ctx = this.cropCanvas.getContext('2d');
                 ctx.drawImage(img, 0, 0);
             }
+
             const rect = this.cropCanvas.getBoundingClientRect();
             const startWidth = rect.width * 0.5;
             const startHeight = rect.height * 0.5;
@@ -915,6 +924,7 @@ class SpritesheetGenerator {
             }
             this.isCropping = true;
             this.showWarning('Drag or resize selection, then confirm');
+
         };
         img.src = this.extractedFrames[0];
     }
@@ -1027,6 +1037,7 @@ class SpritesheetGenerator {
             y: Math.round(this.cropBoxData.y * scaleY),
             width: Math.round(this.cropBoxData.width * scaleX),
             height: Math.round(this.cropBoxData.height * scaleY)
+
         };
         this.hideCropOverlay();
         this.cropSpritesheet(region);
@@ -1040,6 +1051,7 @@ class SpritesheetGenerator {
     }
 
     hideCropOverlay() {
+
         if (this.cropOverlay) {
             this.cropOverlay.classList.add('hidden');
         }

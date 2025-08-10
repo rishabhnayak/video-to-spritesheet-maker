@@ -966,6 +966,7 @@ input[type="file"] {
     z-index: 1000;
 }
 
+
 .crop-modal {
     display: flex;
     flex-direction: column;
@@ -975,9 +976,11 @@ input[type="file"] {
 
 .crop-container {
     position: relative;
+
     max-width: 90vw;
     max-height: 80vh;
 }
+
 
 .crop-container canvas {
     max-width: 100%;
@@ -1024,6 +1027,7 @@ input[type="file"] {
 }
 
 .crop-actions {
+
     display: flex;
     gap: var(--space-8);
     justify-content: center;
