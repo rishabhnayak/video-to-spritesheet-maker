@@ -14,6 +14,11 @@ class SpritesheetGenerator {
         this.videoCanvas = null;
         this.videoCtx = null;
         this.videoTransparencyFrame = null;
+
+        // Cropping state
+        this.isCropping = false;
+        this.cropStart = null;
+        this.cropRect = null;
         
         this.initializeElements();
         this.setupEventListeners();
@@ -78,6 +83,7 @@ class SpritesheetGenerator {
         this.zoomInBtn = document.getElementById('zoomInBtn');
         this.zoomOutBtn = document.getElementById('zoomOutBtn');
         this.resetZoomBtn = document.getElementById('resetZoomBtn');
+        this.cropBtn = document.getElementById('cropBtn');
         this.exportBtn = document.getElementById('exportBtn');
         this.exportStatus = document.getElementById('exportStatus');
 
@@ -218,7 +224,17 @@ class SpritesheetGenerator {
         if (this.resetZoomBtn) {
             this.resetZoomBtn.addEventListener('click', () => this.resetZoom());
         }
-        
+
+        if (this.cropBtn) {
+            this.cropBtn.addEventListener('click', () => this.enableCropMode());
+        }
+
+        if (this.previewCanvasEl) {
+            this.previewCanvasEl.addEventListener('mousedown', (e) => this.handleCanvasMouseDown(e));
+            this.previewCanvasEl.addEventListener('mousemove', (e) => this.handleCanvasMouseMove(e));
+            document.addEventListener('mouseup', (e) => this.handleCanvasMouseUp(e));
+        }
+
         if (this.exportBtn) {
             this.exportBtn.addEventListener('click', () => this.exportSpritesheet());
         }
@@ -828,12 +844,143 @@ class SpritesheetGenerator {
         if (this.previewSection) {
             this.previewSection.classList.remove('hidden');
         }
-        
+
+        if (this.cropBtn) {
+            this.cropBtn.disabled = false;
+        }
+
         this.resetZoom();
 
         // Scroll to preview
         if (this.previewSection) {
             this.previewSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
+
+
+    enableCropMode() {
+        if (!this.spritesheet) return;
+        this.isCropping = true;
+        this.cropStart = null;
+        this.cropRect = null;
+        this.showWarning('Drag on a frame to select crop region');
+    }
+
+    handleCanvasMouseDown(e) {
+        if (!this.isCropping || !this.previewCanvasEl) return;
+        const rect = this.previewCanvasEl.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        this.cropStart = { x, y };
+        this.cropRect = { x, y, width: 0, height: 0 };
+        this.drawCropOverlay();
+    }
+
+    handleCanvasMouseMove(e) {
+        if (!this.isCropping || !this.cropStart || !this.previewCanvasEl) return;
+        const rect = this.previewCanvasEl.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        this.cropRect = {
+            x: Math.min(x, this.cropStart.x),
+            y: Math.min(y, this.cropStart.y),
+            width: Math.abs(x - this.cropStart.x),
+            height: Math.abs(y - this.cropStart.y)
+        };
+        this.drawCropOverlay();
+    }
+
+    handleCanvasMouseUp(e) {
+        if (!this.isCropping) return;
+        this.isCropping = false;
+        if (!this.cropRect || this.cropRect.width < 5 || this.cropRect.height < 5) {
+            this.clearCropOverlay();
+            return;
+        }
+
+        const rect = this.cropRect;
+        this.cropStart = null;
+        this.clearCropOverlay();
+
+        const scale = this.spritesheet.previewScale;
+        const frameWidth = this.spritesheet.spriteWidth * scale;
+        const frameHeight = this.spritesheet.spriteHeight * scale;
+        const col = Math.floor(rect.x / frameWidth);
+        const row = Math.floor(rect.y / frameHeight);
+        const frameX = rect.x - col * frameWidth;
+        const frameY = rect.y - row * frameHeight;
+
+        let cropX = Math.max(0, Math.round(frameX / scale));
+        let cropY = Math.max(0, Math.round(frameY / scale));
+        let cropWidth = Math.min(this.spritesheet.spriteWidth - cropX, Math.round(rect.width / scale));
+        let cropHeight = Math.min(this.spritesheet.spriteHeight - cropY, Math.round(rect.height / scale));
+
+        this.cropSpritesheet({ x: cropX, y: cropY, width: cropWidth, height: cropHeight });
+    }
+
+    drawCropOverlay() {
+        if (!this.previewCanvasEl || !this.spritesheet) return;
+        const ctx = this.previewCanvasEl.getContext('2d');
+        ctx.clearRect(0, 0, this.previewCanvasEl.width, this.previewCanvasEl.height);
+        ctx.drawImage(this.spritesheet.previewCanvas, 0, 0);
+        if (this.cropRect) {
+            ctx.strokeStyle = 'red';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(this.cropRect.x, this.cropRect.y, this.cropRect.width, this.cropRect.height);
+        }
+    }
+
+    clearCropOverlay() {
+        if (!this.previewCanvasEl || !this.spritesheet) return;
+        const ctx = this.previewCanvasEl.getContext('2d');
+        ctx.clearRect(0, 0, this.previewCanvasEl.width, this.previewCanvasEl.height);
+        ctx.drawImage(this.spritesheet.previewCanvas, 0, 0);
+    }
+
+    async cropSpritesheet(region) {
+        if (!this.extractedFrames.length) {
+            this.showError('No frames available to crop');
+            return;
+        }
+
+        const { x, y, width, height } = region;
+        if (width <= 0 || height <= 0) {
+            this.showError('Invalid crop region');
+            return;
+        }
+
+        if (this.cropBtn) {
+            this.cropBtn.disabled = true;
+        }
+
+        const croppedFrames = [];
+        for (const frameData of this.extractedFrames) {
+            const img = new Image();
+            await new Promise((resolve, reject) => {
+                img.onload = resolve;
+                img.onerror = reject;
+                img.src = frameData;
+            });
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, x, y, width, height, 0, 0, width, height);
+            croppedFrames.push(canvas.toDataURL('image/png', 1.0));
+        }
+
+        const settings = this.getCurrentSettings();
+        settings.spriteWidth = width;
+        settings.spriteHeight = height;
+        const spritesheets = await this.createSpritesheets(croppedFrames, settings);
+        this.extractedFrames = croppedFrames;
+        this.spritesheet = spritesheets;
+        this.applyTransparencyToSpritesheet(settings.transparentBackground);
+        this.displaySpritesheet(this.spritesheet, settings);
+        this.showSuccess('Spritesheet cropped successfully!');
+
+        if (this.cropBtn) {
+            this.cropBtn.disabled = false;
         }
     }
 
