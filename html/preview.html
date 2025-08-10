@@ -1,37 +1,42 @@
-            <section class="preview-section card hidden" id="previewSection">
-                <div class="card__body">
-                    <h2>4. Spritesheet Preview</h2>
-                    <div class="spritesheet-info" id="spritesheetInfo">
-                        <div class="info-grid">
-                            <span>Frames: <strong id="frameCount">0</strong></span>
-                            <span>Grid Size: <strong id="gridSize">0×0</strong></span>
-                            <span>Full Size: <strong id="sheetSize">0×0</strong></span>
-                            <span>Preview Size: <strong id="previewSize">0×0</strong></span>
-                        </div>
-                    </div>
-                    <div class="preview-container">
-                        <div class="preview-controls">
-                            <button type="button" class="btn btn--sm" id="zoomInBtn">Zoom In</button>
-                            <button type="button" class="btn btn--sm" id="zoomOutBtn">Zoom Out</button>
-                            <button type="button" class="btn btn--sm" id="resetZoomBtn">Reset</button>
-                        </div>
-                        <div class="canvas-wrapper" id="canvasWrapper">
-                            <canvas id="previewCanvas"></canvas>
-                        </div>
-                    </div>
-                    <div class="transparent-bg-control">
-                        <label>
-                            <input type="checkbox" id="transparentBgToggle">
-                            Replace black background with transparency
-                        </label>
-                    </div>
-                    <div class="export-controls">
-                        <button type="button" class="btn btn--primary btn--full-width" id="exportBtn">
-                            Export PNG (Full Resolution)
-                        </button>
-                        <div class="export-status hidden" id="exportStatus">
-                            <span class="status-text">Preparing download...</span>
-                        </div>
-                    </div>
-                </div>
-            </section>
+<section class="card mb-4 hidden" id="previewSection">
+  <div class="card-body">
+    <h2 class="h4 mb-3">4. Spritesheet Preview</h2>
+    <div class="d-flex flex-wrap gap-3 mb-3">
+      <span id="frameCount"></span>
+      <span>Grid Size: <strong id="gridSize">0×0</strong></span>
+      <span>Full Size: <strong id="sheetSize">0×0</strong></span>
+      <span>Preview Size: <strong id="previewSize">0×0</strong></span>
+    </div>
+    <div class="preview-container mb-3">
+      <div class="d-flex gap-2 mb-2">
+        <button type="button" class="btn btn-outline-secondary btn-sm" id="zoomInBtn">Zoom In</button>
+        <button type="button" class="btn btn-outline-secondary btn-sm" id="zoomOutBtn">Zoom Out</button>
+        <button type="button" class="btn btn-outline-secondary btn-sm" id="resetZoomBtn">Reset</button>
+      </div>
+      <div class="canvas-wrapper" id="canvasWrapper">
+        <canvas id="previewCanvas"></canvas>
+      </div>
+    </div>
+    <div class="gif-preview-container mb-3">
+      <h3 class="h6">Animation Preview</h3>
+      <canvas id="animationPreview" class="gif-preview hidden"></canvas>
+    </div>
+    <div class="form-check mb-3">
+      <input class="form-check-input" type="checkbox" id="transparentBgToggle">
+      <label class="form-check-label" for="transparentBgToggle">
+        Replace black background with transparency
+      </label>
+    </div>
+    <div class="crop-controls mb-3">
+      <button type="button" class="btn btn-secondary w-100" id="cropBtn" disabled>Crop Sprites</button>
+    </div>
+    <div class="export-controls">
+      <button type="button" class="btn btn-primary w-100" id="exportBtn">
+        Export PNG (Full Resolution)
+      </button>
+      <div class="export-status hidden mt-2" id="exportStatus">
+        <span class="status-text">Preparing download...</span>
+      </div>
+    </div>
+  </div>
+</section>
