@@ -1001,7 +1001,43 @@ class SpritesheetGenerator {
             this.gifPreview.classList.remove('hidden');
         });
 
-        gif.render();
+        if (typeof GIF === 'undefined') {
+            alert('GIF library is not loaded. Cannot generate preview GIF.');
+            return;
+        }
+
+        let gif;
+        try {
+            gif = new GIF({
+                workers: 2,
+                quality: 10,
+                workerScript: 'https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.worker.js'
+            });
+
+            for (const frame of frames) {
+                const img = new Image();
+                await new Promise((resolve, reject) => {
+                    img.onload = resolve;
+                    img.onerror = reject;
+                    img.src = frame;
+                });
+                gif.addFrame(img, { delay: 1000 / (settings.fps || 30) });
+            }
+
+            gif.on('finished', (blob) => {
+                const url = URL.createObjectURL(blob);
+                this.gifPreviewImg.src = url;
+                this.gifPreview.classList.remove('hidden');
+            });
+
+            gif.on('error', (err) => {
+                alert('Failed to generate GIF preview: ' + (err && err.message ? err.message : err));
+            });
+
+            gif.render();
+        } catch (err) {
+            alert('An error occurred while generating the GIF preview: ' + (err && err.message ? err.message : err));
+        }
     }
 
     async seekToTime(video, time) {
