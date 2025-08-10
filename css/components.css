@@ -954,3 +954,116 @@ input[type="file"] {
     gap: var(--space-8);
     font-size: var(--font-size-sm);
 }
+
+/* Crop overlay */
+.crop-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.crop-modal {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-16);
+}
+
+.crop-container {
+    position: relative;
+    max-width: 90vw;
+    max-height: 80vh;
+}
+
+.crop-container canvas {
+    max-width: 100%;
+    max-height: 100%;
+    display: block;
+}
+
+.crop-box {
+    position: absolute;
+    border: 2px solid #00e0ff;
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.65);
+    cursor: move;
+    will-change: transform;
+}
+
+.crop-box .handle {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: #ffffff;
+    border: 2px solid #00e0ff;
+    box-sizing: border-box;
+}
+
+.handle-n { top: -6px; left: 50%; transform: translateX(-50%); cursor: ns-resize; }
+.handle-s { bottom: -6px; left: 50%; transform: translateX(-50%); cursor: ns-resize; }
+.handle-e { right: -6px; top: 50%; transform: translateY(-50%); cursor: ew-resize; }
+.handle-w { left: -6px; top: 50%; transform: translateY(-50%); cursor: ew-resize; }
+.handle-ne { top: -6px; right: -6px; cursor: nesw-resize; }
+.handle-nw { top: -6px; left: -6px; cursor: nwse-resize; }
+.handle-se { bottom: -6px; right: -6px; cursor: nwse-resize; }
+.handle-sw { bottom: -6px; left: -6px; cursor: nesw-resize; }
+
+.crop-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-12);
+}
+
+.ratio-select {
+    display: flex;
+    align-items: center;
+    gap: var(--space-8);
+}
+
+.crop-actions {
+    display: flex;
+    gap: var(--space-8);
+    justify-content: center;
+}
+
+.grid-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.crop-label {
+    position: absolute;
+    top: -24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    padding: 2px 4px;
+    font-size: 12px;
+    border-radius: 4px;
+    white-space: nowrap;
+}
+
+.grid-controls,
+.manual-controls,
+.transform-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-8);
+    justify-content: center;
+}
+
+.manual-controls .input-group {
+    width: 70px;
+}
+
+.lock-aspect {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+}
