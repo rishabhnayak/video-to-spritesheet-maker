@@ -390,3 +390,19 @@ pre code {
   padding: 0;
 }
 
+
+:root {
+  /* Bootstrap inspired overrides */
+  --color-background: #f8f9fa;
+  --color-surface: #ffffff;
+  --color-text: #212529;
+  --color-text-secondary: #6c757d;
+  --color-primary: #5d87ff;
+  --color-primary-hover: #5166d7;
+  --color-primary-active: #3953c6;
+  --color-secondary: #e9ecef;
+  --color-secondary-hover: #dee2e6;
+  --color-secondary-active: #ced4da;
+  --color-border: #dee2e6;
+  --color-btn-primary-text: #ffffff;
+}

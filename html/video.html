@@ -1,24 +1,22 @@
-            <section class="video-section card hidden" id="videoSection">
-                <div class="card__body">
-                    <h2>2. Video Preview</h2>
-                    <div class="video-container">
-                        <video id="videoPlayer" controls>
-                            Your browser does not support the video tag.
-                        </video>
-                        <canvas id="videoCanvas" class="hidden"></canvas>
-                    </div>
-                    <div class="transparent-bg-control">
-                        <label>
-                            <input type="checkbox" id="videoTransparentBgToggle">
-                            Replace black background with transparency
-                        </label>
-                    </div>
-                    <div class="video-info" id="videoInfo">
-                        <div class="video-metadata">
-                            <span id="videoDuration"></span>
-                            <span id="videoResolution"></span>
-                            <span id="videoFrameRate"></span>
-                        </div>
-                    </div>
-                </div>
-            </section>
+<section class="card mb-4 hidden" id="videoSection">
+  <div class="card-body">
+    <h2 class="h4 mb-3">2. Video Preview</h2>
+    <div class="video-container text-center">
+      <video id="videoPlayer" controls class="w-100">
+        Your browser does not support the video tag.
+      </video>
+      <canvas id="videoCanvas" class="hidden w-100"></canvas>
+    </div>
+    <div class="form-check mt-3">
+      <input class="form-check-input" type="checkbox" id="videoTransparentBgToggle">
+      <label class="form-check-label" for="videoTransparentBgToggle">Replace black background with transparency</label>
+    </div>
+    <div class="video-info mt-3" id="videoInfo">
+      <div class="video-metadata d-flex flex-wrap gap-3">
+        <span id="videoDuration"></span>
+        <span id="videoResolution"></span>
+        <span id="videoFrameRate"></span>
+      </div>
+    </div>
+  </div>
+</section>
