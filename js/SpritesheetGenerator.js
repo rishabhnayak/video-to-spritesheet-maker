@@ -19,8 +19,10 @@ class SpritesheetGenerator {
         this.isCropping = false;
         this.cropStart = null;
         this.cropRect = null;
+
         this.cropCanvasEl = null;
         this.cropImage = null;
+
         
         this.initializeElements();
         this.setupEventListeners();
@@ -249,6 +251,7 @@ class SpritesheetGenerator {
 
         if (this.cancelCropBtn) {
             this.cancelCropBtn.addEventListener('click', () => this.cancelCropSelection());
+
         }
 
         if (this.exportBtn) {
@@ -875,6 +878,7 @@ class SpritesheetGenerator {
 
 
     enableCropMode() {
+
         if (!this.extractedFrames.length) return;
         if (this.cropBtn) {
             this.cropBtn.disabled = true;
@@ -911,8 +915,10 @@ class SpritesheetGenerator {
     }
 
     handleCanvasMouseMove(e) {
+
         if (!this.isCropping || !this.cropStart || !this.cropCanvasEl) return;
         const rect = this.cropCanvasEl.getBoundingClientRect();
+
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
         this.cropRect = {
@@ -929,6 +935,7 @@ class SpritesheetGenerator {
         this.isCropping = false;
         if (!this.cropRect || this.cropRect.width < 5 || this.cropRect.height < 5) {
             this.clearCropOverlay();
+
             this.cropRect = null;
             return;
         }
@@ -941,6 +948,7 @@ class SpritesheetGenerator {
         const ctx = this.cropCanvasEl.getContext('2d');
         ctx.clearRect(0, 0, this.cropCanvasEl.width, this.cropCanvasEl.height);
         ctx.drawImage(this.cropImage, 0, 0);
+
         if (this.cropRect) {
             ctx.strokeStyle = 'red';
             ctx.lineWidth = 2;
@@ -949,6 +957,7 @@ class SpritesheetGenerator {
     }
 
     clearCropOverlay() {
+
         if (!this.cropCanvasEl || !this.cropImage) return;
         const ctx = this.cropCanvasEl.getContext('2d');
         ctx.clearRect(0, 0, this.cropCanvasEl.width, this.cropCanvasEl.height);
@@ -987,6 +996,7 @@ class SpritesheetGenerator {
         this.cropImage = null;
         this.cropStart = null;
         this.cropRect = null;
+
     }
 
     async cropSpritesheet(region) {
