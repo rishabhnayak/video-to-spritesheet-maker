@@ -456,6 +456,13 @@ select.form-control {
     box-shadow: var(--shadow-md);
 }
 
+.video-container canvas {
+    max-width: 100%;
+    max-height: 400px;
+    border-radius: var(--radius-base);
+    box-shadow: var(--shadow-md);
+}
+
 .video-info {
     padding: var(--space-16);
     background: var(--color-bg-4);
@@ -934,4 +941,16 @@ input[type="file"] {
     width: 0 !important;
     height: 0 !important;
     opacity: 0 !important;
+}
+
+/* Transparent background toggle */
+.transparent-bg-control {
+    margin: var(--space-16) 0;
+}
+
+.transparent-bg-control label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-8);
+    font-size: var(--font-size-sm);
 }

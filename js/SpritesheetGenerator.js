@@ -11,6 +11,9 @@ class SpritesheetGenerator {
         this.zoomLevel = 1;
         this.videoAspectRatio = 1;
         this.maxPreviewWidth = 800;
+        this.videoCanvas = null;
+        this.videoCtx = null;
+        this.videoTransparencyFrame = null;
         
         this.initializeElements();
         this.setupEventListeners();
@@ -34,6 +37,11 @@ class SpritesheetGenerator {
         this.videoDuration = document.getElementById('videoDuration');
         this.videoResolution = document.getElementById('videoResolution');
         this.videoFrameRate = document.getElementById('videoFrameRate');
+        this.videoCanvas = document.getElementById('videoCanvas');
+        this.videoTransparentBgToggle = document.getElementById('videoTransparentBgToggle');
+        if (this.videoCanvas) {
+            this.videoCtx = this.videoCanvas.getContext('2d');
+        }
 
         // Settings elements
         this.settingsSection = document.getElementById('settingsSection');
@@ -83,6 +91,9 @@ class SpritesheetGenerator {
         this.compressionValue = document.getElementById('compressionValue');
         this.compressionInfo = document.getElementById('compressionInfo');
         this.formatSelect = document.getElementById('formatSelect');
+
+        // Background transparency toggle
+        this.transparentBgToggle = document.getElementById('transparentBgToggle');
 
     }
 
@@ -232,6 +243,24 @@ class SpritesheetGenerator {
         if (this.formatSelect) {
             this.formatSelect.addEventListener('change', () => {
                 this.updateCompressionInfo();
+            });
+        }
+
+        if (this.videoTransparentBgToggle) {
+            this.videoTransparentBgToggle.addEventListener('change', () => {
+                if (this.videoTransparentBgToggle.checked) {
+                    this.startVideoTransparency();
+                } else {
+                    this.stopVideoTransparency();
+                }
+            });
+        }
+
+        if (this.transparentBgToggle) {
+            this.transparentBgToggle.addEventListener('change', () => {
+                if (this.spritesheet) {
+                    this.applyTransparencyToSpritesheet(this.transparentBgToggle.checked);
+                }
             });
         }
 
@@ -495,7 +524,11 @@ class SpritesheetGenerator {
         // Update UI state
         this.updateUIState();
         this.updateCustomResolutionInfo();
-        
+
+        if (this.videoTransparentBgToggle && this.videoTransparentBgToggle.checked) {
+            this.startVideoTransparency();
+        }
+
         this.showSuccess('Video loaded successfully! Configure settings and generate spritesheet.');
     }
 
@@ -526,7 +559,8 @@ class SpritesheetGenerator {
             }
 
             this.spritesheet = spritesheets;
-            this.displaySpritesheet(spritesheets, settings);
+            this.applyTransparencyToSpritesheet(settings.transparentBackground);
+            this.displaySpritesheet(this.spritesheet, settings);
             this.hideGenerationProgress();
             this.showSuccess('Spritesheet generated successfully!');
 
@@ -587,7 +621,8 @@ class SpritesheetGenerator {
             filename: (this.filenameInput ? this.filenameInput.value : 'spritesheet') || 'spritesheet',
             // Add compression settings
             compressionQuality: parseInt(this.compressionSlider ? this.compressionSlider.value : 95),
-            exportFormat: this.formatSelect ? this.formatSelect.value : 'png'
+            exportFormat: this.formatSelect ? this.formatSelect.value : 'png',
+            transparentBackground: this.transparentBgToggle ? this.transparentBgToggle.checked : false
         };
     }
 
@@ -735,9 +770,22 @@ class SpritesheetGenerator {
             }
         }
 
+        // Clone original canvases for background processing
+        const originalFullCanvas = document.createElement('canvas');
+        originalFullCanvas.width = sheetWidth;
+        originalFullCanvas.height = sheetHeight;
+        originalFullCanvas.getContext('2d').drawImage(fullCanvas, 0, 0);
+
+        const originalPreviewCanvas = document.createElement('canvas');
+        originalPreviewCanvas.width = previewWidth;
+        originalPreviewCanvas.height = previewHeight;
+        originalPreviewCanvas.getContext('2d').drawImage(previewCanvas, 0, 0);
+
         return {
             fullCanvas,
             previewCanvas,
+            originalFullCanvas,
+            originalPreviewCanvas,
             columns,
             rows,
             frameCount,
@@ -785,6 +833,87 @@ class SpritesheetGenerator {
         if (this.previewSection) {
             this.previewSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
+    }
+
+    startVideoTransparency() {
+        if (!this.videoPlayer || !this.videoCanvas || !this.videoCtx) return;
+        this.videoCanvas.width = this.videoPlayer.videoWidth;
+        this.videoCanvas.height = this.videoPlayer.videoHeight;
+        this.videoCanvas.classList.remove('hidden');
+        this.videoPlayer.classList.add('hidden');
+
+        const render = () => {
+            if (!this.videoTransparentBgToggle || !this.videoTransparentBgToggle.checked) return;
+            this.videoCtx.drawImage(this.videoPlayer, 0, 0, this.videoCanvas.width, this.videoCanvas.height);
+            this.makeBackgroundTransparent(this.videoCtx, this.videoCanvas.width, this.videoCanvas.height);
+            this.videoTransparencyFrame = requestAnimationFrame(render);
+        };
+        render();
+    }
+
+    stopVideoTransparency() {
+        if (this.videoTransparencyFrame) {
+            cancelAnimationFrame(this.videoTransparencyFrame);
+            this.videoTransparencyFrame = null;
+        }
+        if (this.videoCanvas) {
+            this.videoCanvas.classList.add('hidden');
+        }
+        if (this.videoPlayer) {
+            this.videoPlayer.classList.remove('hidden');
+        }
+    }
+
+    applyTransparencyToSpritesheet(enabled) {
+        if (!this.spritesheet) return;
+
+        const { originalFullCanvas, originalPreviewCanvas, fullCanvas, previewCanvas } = this.spritesheet;
+        const fullCtx = fullCanvas.getContext('2d');
+        const previewCtx = previewCanvas.getContext('2d');
+
+        // Reset from originals
+        fullCtx.clearRect(0, 0, fullCanvas.width, fullCanvas.height);
+        fullCtx.drawImage(originalFullCanvas, 0, 0);
+        previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
+        previewCtx.drawImage(originalPreviewCanvas, 0, 0);
+
+        if (enabled) {
+            this.makeBackgroundTransparent(fullCtx, fullCanvas.width, fullCanvas.height);
+            this.makeBackgroundTransparent(previewCtx, previewCanvas.width, previewCanvas.height);
+        }
+
+        if (this.previewCanvasEl) {
+            const ctx = this.previewCanvasEl.getContext('2d');
+            this.previewCanvasEl.width = previewCanvas.width;
+            this.previewCanvasEl.height = previewCanvas.height;
+            ctx.drawImage(previewCanvas, 0, 0);
+        }
+    }
+
+    makeBackgroundTransparent(ctx, width, height) {
+        const imageData = ctx.getImageData(0, 0, width, height);
+        const data = imageData.data;
+        const threshold = 10; // pure black cutoff
+        const softness = 40; // range for smooth edge fade
+        for (let i = 0; i < data.length; i += 4) {
+            const r = data[i];
+            const g = data[i + 1];
+            const b = data[i + 2];
+            const max = Math.max(r, g, b);
+
+            if (max <= threshold) {
+                data[i + 3] = 0;
+            } else if (max < threshold + softness) {
+                const alphaFactor = (max - threshold) / softness;
+                const newAlpha = alphaFactor * 255;
+                const scale = newAlpha > 0 ? 255 / newAlpha : 0;
+                data[i] = Math.min(255, r * scale);
+                data[i + 1] = Math.min(255, g * scale);
+                data[i + 2] = Math.min(255, b * scale);
+                data[i + 3] = newAlpha;
+            }
+        }
+        ctx.putImageData(imageData, 0, 0);
     }
 
     async seekToTime(video, time) {

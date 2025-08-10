@@ -50,6 +50,13 @@
                         <video id="videoPlayer" controls>
                             Your browser does not support the video tag.
                         </video>
+                        <canvas id="videoCanvas" class="hidden"></canvas>
+                    </div>
+                    <div class="transparent-bg-control">
+                        <label>
+                            <input type="checkbox" id="videoTransparentBgToggle">
+                            Replace black background with transparency
+                        </label>
                     </div>
                     <div class="video-info" id="videoInfo">
                         <div class="video-metadata">
@@ -207,6 +214,12 @@
                         <div class="canvas-wrapper" id="canvasWrapper">
                             <canvas id="previewCanvas"></canvas>
                         </div>
+                    </div>
+                    <div class="transparent-bg-control">
+                        <label>
+                            <input type="checkbox" id="transparentBgToggle">
+                            Replace black background with transparency
+                        </label>
                     </div>
                     <div class="export-controls">
                         <button type="button" class="btn btn--primary btn--full-width" id="exportBtn">
