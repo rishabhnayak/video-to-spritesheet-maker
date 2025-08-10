@@ -102,6 +102,15 @@ class SpritesheetGenerator {
                 document.body.appendChild(this.cropArea);
             }
         }
+        if (!this.cropArea) {
+            this.cropArea = document.createElement('div');
+            this.cropArea.id = 'cropArea';
+            if (this.cropContainer) {
+                this.cropContainer.appendChild(this.cropArea);
+            } else {
+                document.body.appendChild(this.cropArea);
+            }
+        }
         this.applyCropBtn = document.getElementById('applyCropBtn');
         this.cancelCropBtn = document.getElementById('cancelCropBtn');
         // If cancelCropBtn does not exist, create and append it to cropPopup
