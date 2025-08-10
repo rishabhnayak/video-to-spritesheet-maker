@@ -1512,6 +1512,22 @@ class SpritesheetGenerator {
             }
         }
         ctx.putImageData(imageData, 0, 0);
+        this.addSmoothBorder(ctx, width, height);
+    }
+
+    addSmoothBorder(ctx, width, height) {
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = width;
+        tempCanvas.height = height;
+        const tempCtx = tempCanvas.getContext('2d');
+        tempCtx.drawImage(ctx.canvas, 0, 0);
+
+        ctx.save();
+        ctx.globalCompositeOperation = 'destination-over';
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+        ctx.shadowBlur = 2;
+        ctx.drawImage(tempCanvas, 0, 0);
+        ctx.restore();
     }
 
     async seekToTime(video, time) {
