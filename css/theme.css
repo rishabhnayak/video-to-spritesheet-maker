@@ -1,0 +1,57 @@
+:root {
+  --bs-primary: #2196f3;
+  --bs-primary-rgb: 33,150,243;
+  --bs-body-font-family: 'Roboto', sans-serif;
+}
+
+.header-bg {
+  background: linear-gradient(135deg, #2196f3, #1976d2);
+  color: #fff;
+  padding: 4rem 0;
+}
+
+.card {
+  border: none;
+  border-radius: 0.75rem;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.drop-zone {
+  border: 2px dashed var(--bs-primary);
+  border-radius: 0.75rem;
+  padding: 3rem 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.drop-zone.dragover {
+  background-color: rgba(var(--bs-primary-rgb), 0.1);
+}
+
+.preview-container .canvas-wrapper {
+  overflow: auto;
+  border: 1px solid #dee2e6;
+  border-radius: 0.5rem;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* Responsive enhancements */
+.video-container video,
+.video-container canvas {
+  max-width: 100%;
+  border-radius: 0.5rem;
+}
+
+.gif-preview-container canvas {
+  max-width: 100%;
+}
+
+@media (max-width: 576px) {
+  .drop-zone {
+    padding: 2rem 1rem;
+  }
+}

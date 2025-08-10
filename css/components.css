@@ -1010,24 +1010,21 @@ input[type="file"] {
     display: block;
 }
 
+/* Crop box styling */
 .crop-box {
     position: absolute;
-
-    border: 2px solid #00e0ff;
+    border: 2px solid var(--bs-primary);
     box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.65);
     cursor: move;
     will-change: transform;
-
 }
 
 .crop-box .handle {
     position: absolute;
-
     width: 10px;
     height: 10px;
     background: #ffffff;
-    border: 2px solid #00e0ff;
-
+    border: 2px solid var(--bs-primary);
     box-sizing: border-box;
 }
 
