@@ -28,6 +28,7 @@ class SpritesheetGenerator {
         this.currentAspect = null;
         this.aspectLocked = false;
         this.cropTransform = { rotation: 0, flipH: false, flipV: false };
+        this.cropZoom = 1;
 
         
         this.initializeElements();
@@ -116,6 +117,8 @@ class SpritesheetGenerator {
         this.rotateRightBtn = document.getElementById('rotateRightBtn');
         this.flipHBtn = document.getElementById('flipHBtn');
         this.flipVBtn = document.getElementById('flipVBtn');
+        this.cropZoomInBtn = document.getElementById('cropZoomInBtn');
+        this.cropZoomOutBtn = document.getElementById('cropZoomOutBtn');
 
         this.confirmCropBtn = document.getElementById('confirmCropBtn');
         this.cancelCropBtn = document.getElementById('cancelCropBtn');
@@ -314,6 +317,13 @@ class SpritesheetGenerator {
         }
         if (this.flipVBtn) {
             this.flipVBtn.addEventListener('click', () => this.flipSelection('v'));
+        }
+
+        if (this.cropZoomInBtn) {
+            this.cropZoomInBtn.addEventListener('click', () => this.adjustCropZoom(0.1));
+        }
+        if (this.cropZoomOutBtn) {
+            this.cropZoomOutBtn.addEventListener('click', () => this.adjustCropZoom(-0.1));
         }
 
 
@@ -1000,12 +1010,16 @@ class SpritesheetGenerator {
                 this.cropCanvas.width = img.width;
                 this.cropCanvas.height = img.height;
                 const ctx = this.cropCanvas.getContext('2d');
+                this.cropCanvas.style.maxWidth = 'none';
+                this.cropCanvas.style.maxHeight = 'none';
                 ctx.drawImage(img, 0, 0);
             }
 
             if (this.gridCanvas) {
                 this.gridCanvas.width = img.width;
                 this.gridCanvas.height = img.height;
+                this.gridCanvas.style.maxWidth = 'none';
+                this.gridCanvas.style.maxHeight = 'none';
                 this.drawGrid();
             }
 
@@ -1024,6 +1038,13 @@ class SpritesheetGenerator {
                 this.cropOverlay.classList.remove('hidden');
                 this.cropBox.classList.add('hidden');
             }
+            const container = this.cropCanvas ? this.cropCanvas.parentElement : null;
+            this.cropZoom = 1;
+            if (container) {
+                const fitScale = Math.min(container.clientWidth / img.width, 1);
+                this.cropZoom = fitScale;
+            }
+            this.adjustCropZoom(0);
             this.isCropping = true;
             this.showWarning('Click on image to place crop area');
 
@@ -1219,6 +1240,35 @@ class SpritesheetGenerator {
         ctx.stroke();
     }
 
+    adjustCropZoom(delta) {
+        if (!this.cropCanvas) return;
+        const prevZoom = this.cropZoom;
+        this.cropZoom = Math.min(Math.max(this.cropZoom + delta, 0.1), 5);
+        const width = this.cropCanvas.width * this.cropZoom;
+        const height = this.cropCanvas.height * this.cropZoom;
+        this.cropCanvas.style.maxWidth = 'none';
+        this.cropCanvas.style.maxHeight = 'none';
+        this.cropCanvas.style.width = `${width}px`;
+        this.cropCanvas.style.height = `${height}px`;
+        if (this.gridCanvas) {
+            this.gridCanvas.style.maxWidth = 'none';
+            this.gridCanvas.style.maxHeight = 'none';
+            this.gridCanvas.style.width = `${width}px`;
+            this.gridCanvas.style.height = `${height}px`;
+        }
+        if (this.cropBoxData) {
+            const scale = this.cropZoom / prevZoom;
+            this.cropBoxData = {
+                x: this.cropBoxData.x * scale,
+                y: this.cropBoxData.y * scale,
+                width: this.cropBoxData.width * scale,
+                height: this.cropBoxData.height * scale
+            };
+            this.updateCropBoxUI();
+        }
+        this.drawGrid();
+    }
+
     rotateSelection(angle) {
         this.cropTransform.rotation = (this.cropTransform.rotation + angle) % 360;
     }
@@ -1273,6 +1323,19 @@ class SpritesheetGenerator {
             this.gridCanvas.classList.add('hidden');
         }
 
+        if (this.cropCanvas) {
+            this.cropCanvas.style.width = '';
+            this.cropCanvas.style.height = '';
+            this.cropCanvas.style.maxWidth = '';
+            this.cropCanvas.style.maxHeight = '';
+        }
+        if (this.gridCanvas) {
+            this.gridCanvas.style.width = '';
+            this.gridCanvas.style.height = '';
+            this.gridCanvas.style.maxWidth = '';
+            this.gridCanvas.style.maxHeight = '';
+        }
+        this.cropZoom = 1;
         this.isCropping = false;
         this.cropBoxData = null;
         this.isDraggingCrop = false;
