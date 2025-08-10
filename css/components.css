@@ -679,6 +679,21 @@ select.form-control {
     image-rendering: crisp-edges;
 }
 
+.gif-preview-container {
+    text-align: center;
+    margin-top: var(--space-16);
+}
+
+.gif-preview {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    image-rendering: pixelated;
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-sm);
+}
+
 /* Time Range Inputs */
 .time-range-inputs {
     display: grid;

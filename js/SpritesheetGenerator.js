@@ -944,6 +944,35 @@ class SpritesheetGenerator {
         if (this.previewSection) {
             this.previewSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
+
+        this.createGifPreview(this.extractedFrames, settings.fps);
+    }
+
+    createGifPreview(frames, fps) {
+        const previewImg = document.getElementById('gifPreview');
+        if (!previewImg || !frames.length || typeof GIF === 'undefined') return;
+
+        previewImg.classList.add('hidden');
+
+        const gif = new GIF({
+            workers: 2,
+            quality: 10,
+            workerScript: 'https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.worker.js'
+        });
+
+        frames.forEach(frame => {
+            const img = document.createElement('img');
+            img.src = frame;
+            gif.addFrame(img, { delay: 1000 / fps });
+        });
+
+        gif.on('finished', blob => {
+            const url = URL.createObjectURL(blob);
+            previewImg.src = url;
+            previewImg.classList.remove('hidden');
+        });
+
+        gif.render();
     }
 
 
