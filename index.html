@@ -240,9 +240,9 @@
     </div>
 
     <div id="cropOverlay" class="crop-overlay hidden">
-        <div class="crop-modal">
-
-            <div class="crop-container">
+        <div class="crop-modal card">
+            <div class="card__body">
+                <div class="crop-container">
                 <canvas id="cropCanvas"></canvas>
                 <canvas id="gridCanvas" class="grid-overlay hidden"></canvas>
                 <div id="cropBox" class="crop-box hidden">
@@ -257,12 +257,12 @@
                     <div class="handle handle-se"></div>
                     <div class="handle handle-sw"></div>
                 </div>
-            </div>
-            <div class="crop-controls">
-                <div class="ratio-select">
-                    <label for="cropRatio">Aspect Ratio</label>
-                    <select id="cropRatio" class="form-control">
-                        <option value="free">Free</option>
+                </div>
+                <div class="crop-controls">
+                    <div class="ratio-select">
+                        <label for="cropRatio">Aspect Ratio</label>
+                        <select id="cropRatio" class="form-control">
+                            <option value="free">Free</option>
 
                         <option value="1:1">Square 1:1</option>
                         <option value="4:5">Portrait 4:5</option>
@@ -307,7 +307,6 @@
                     <button type="button" class="btn btn--primary" id="confirmCropBtn">Confirm Crop</button>
                     <button type="button" class="btn btn--secondary" id="cancelCropBtn">Cancel</button>
                 </div>
-
             </div>
         </div>
     </div>

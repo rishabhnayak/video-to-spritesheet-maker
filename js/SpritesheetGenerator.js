@@ -269,6 +269,9 @@ class SpritesheetGenerator {
         if (this.cropOverlay) {
             this.cropOverlay.addEventListener('mousemove', (e) => this.handleCropInteraction(e));
         }
+        if (this.cropCanvas) {
+            this.cropCanvas.addEventListener('click', (e) => this.placeCropBox(e));
+        }
         document.addEventListener('mouseup', () => this.endCropInteraction());
 
         if (this.cropRatioSelect) {
@@ -968,14 +971,8 @@ class SpritesheetGenerator {
                 this.drawGrid();
             }
 
-            const rect = this.cropCanvas.getBoundingClientRect();
-            const startWidth = rect.width * 0.5;
-            const startHeight = rect.height * 0.5;
-            const startX = (rect.width - startWidth) / 2;
-            const startY = (rect.height - startHeight) / 2;
-            this.cropBoxData = { x: startX, y: startY, width: startWidth, height: startHeight };
+            this.cropBoxData = null;
             this.currentAspect = null;
-
             this.aspectLocked = false;
             this.cropTransform = { rotation: 0, flipH: false, flipV: false };
             if (this.cropRatioSelect) {
@@ -985,16 +982,41 @@ class SpritesheetGenerator {
                 this.lockAspect.checked = false;
             }
 
-            this.updateCropBoxUI();
             if (this.cropOverlay && this.cropBox) {
                 this.cropOverlay.classList.remove('hidden');
-                this.cropBox.classList.remove('hidden');
+                this.cropBox.classList.add('hidden');
             }
             this.isCropping = true;
-            this.showWarning('Drag or resize selection, then confirm');
+            this.showWarning('Click on image to place crop area');
 
         };
         img.src = this.extractedFrames[0];
+    }
+
+    placeCropBox(e) {
+        if (!this.isCropping || !this.cropCanvas) return;
+        if (e.target !== this.cropCanvas) return;
+
+        const rect = this.cropCanvas.getBoundingClientRect();
+        const baseSize = Math.min(rect.width, rect.height) * 0.25;
+        let width = baseSize;
+        let height = this.currentAspect ? baseSize / this.currentAspect : baseSize;
+
+        if (height > rect.height) {
+            height = rect.height;
+            width = this.currentAspect ? height * this.currentAspect : height;
+        }
+
+        let x = e.clientX - rect.left - width / 2;
+        let y = e.clientY - rect.top - height / 2;
+        x = Math.max(0, Math.min(x, rect.width - width));
+        y = Math.max(0, Math.min(y, rect.height - height));
+
+        this.cropBoxData = { x, y, width, height };
+        if (this.cropBox) {
+            this.cropBox.classList.remove('hidden');
+        }
+        this.updateCropBoxUI();
     }
 
     startCropInteraction(e) {
