@@ -11,6 +11,9 @@ class SpritesheetGenerator {
         this.zoomLevel = 1;
         this.videoAspectRatio = 1;
         this.maxPreviewWidth = 800;
+        this.videoCanvas = null;
+        this.videoCtx = null;
+        this.videoTransparencyFrame = null;
         
         this.initializeElements();
         this.setupEventListeners();
@@ -34,6 +37,11 @@ class SpritesheetGenerator {
         this.videoDuration = document.getElementById('videoDuration');
         this.videoResolution = document.getElementById('videoResolution');
         this.videoFrameRate = document.getElementById('videoFrameRate');
+        this.videoCanvas = document.getElementById('videoCanvas');
+        this.videoTransparentBgToggle = document.getElementById('videoTransparentBgToggle');
+        if (this.videoCanvas) {
+            this.videoCtx = this.videoCanvas.getContext('2d');
+        }
 
         // Settings elements
         this.settingsSection = document.getElementById('settingsSection');
@@ -237,6 +245,18 @@ class SpritesheetGenerator {
                 this.updateCompressionInfo();
             });
         }
+
+
+        if (this.videoTransparentBgToggle) {
+            this.videoTransparentBgToggle.addEventListener('change', () => {
+                if (this.videoTransparentBgToggle.checked) {
+                    this.startVideoTransparency();
+                } else {
+                    this.stopVideoTransparency();
+                }
+            });
+        }
+
 
         if (this.transparentBgToggle) {
             this.transparentBgToggle.addEventListener('change', () => {
@@ -506,7 +526,11 @@ class SpritesheetGenerator {
         // Update UI state
         this.updateUIState();
         this.updateCustomResolutionInfo();
-        
+
+        if (this.videoTransparentBgToggle && this.videoTransparentBgToggle.checked) {
+            this.startVideoTransparency();
+        }
+
         this.showSuccess('Video loaded successfully! Configure settings and generate spritesheet.');
     }
 
@@ -810,6 +834,36 @@ class SpritesheetGenerator {
         // Scroll to preview
         if (this.previewSection) {
             this.previewSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
+
+
+    startVideoTransparency() {
+        if (!this.videoPlayer || !this.videoCanvas || !this.videoCtx) return;
+        this.videoCanvas.width = this.videoPlayer.videoWidth;
+        this.videoCanvas.height = this.videoPlayer.videoHeight;
+        this.videoCanvas.classList.remove('hidden');
+        this.videoPlayer.classList.add('hidden');
+
+        const render = () => {
+            if (!this.videoTransparentBgToggle || !this.videoTransparentBgToggle.checked) return;
+            this.videoCtx.drawImage(this.videoPlayer, 0, 0, this.videoCanvas.width, this.videoCanvas.height);
+            this.makeBackgroundTransparent(this.videoCtx, this.videoCanvas.width, this.videoCanvas.height);
+            this.videoTransparencyFrame = requestAnimationFrame(render);
+        };
+        render();
+    }
+
+    stopVideoTransparency() {
+        if (this.videoTransparencyFrame) {
+            cancelAnimationFrame(this.videoTransparencyFrame);
+            this.videoTransparencyFrame = null;
+        }
+        if (this.videoCanvas) {
+            this.videoCanvas.classList.add('hidden');
+        }
+        if (this.videoPlayer) {
+            this.videoPlayer.classList.remove('hidden');
         }
     }
 
