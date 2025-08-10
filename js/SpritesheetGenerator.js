@@ -18,6 +18,7 @@ class SpritesheetGenerator {
 
         // Cropping state
         this.isCropping = false;
+
         this.cropBoxData = null;
         this.isDraggingCrop = false;
         this.isResizingCrop = false;
@@ -27,6 +28,7 @@ class SpritesheetGenerator {
         this.currentAspect = null;
         this.aspectLocked = false;
         this.cropTransform = { rotation: 0, flipH: false, flipV: false };
+
         
         this.initializeElements();
         this.setupEventListeners();
@@ -98,6 +100,7 @@ class SpritesheetGenerator {
         // Crop overlay elements
         this.cropOverlay = document.getElementById('cropOverlay');
         this.cropCanvas = document.getElementById('cropCanvas');
+
         this.gridCanvas = document.getElementById('gridCanvas');
         this.cropBox = document.getElementById('cropBox');
         this.cropLabel = document.getElementById('cropLabel');
@@ -113,6 +116,7 @@ class SpritesheetGenerator {
         this.rotateRightBtn = document.getElementById('rotateRightBtn');
         this.flipHBtn = document.getElementById('flipHBtn');
         this.flipVBtn = document.getElementById('flipVBtn');
+
         this.confirmCropBtn = document.getElementById('confirmCropBtn');
         this.cancelCropBtn = document.getElementById('cancelCropBtn');
 
@@ -258,6 +262,7 @@ class SpritesheetGenerator {
             this.cropBtn.addEventListener('click', () => this.enableCropMode());
         }
 
+
         if (this.cropBox) {
             this.cropBox.addEventListener('mousedown', (e) => this.startCropInteraction(e));
         }
@@ -308,12 +313,14 @@ class SpritesheetGenerator {
             this.flipVBtn.addEventListener('click', () => this.flipSelection('v'));
         }
 
+
         if (this.confirmCropBtn) {
             this.confirmCropBtn.addEventListener('click', () => this.confirmCropSelection());
         }
 
         if (this.cancelCropBtn) {
             this.cancelCropBtn.addEventListener('click', () => this.cancelCropSelection());
+
         }
 
         if (this.exportBtn) {
@@ -941,6 +948,7 @@ class SpritesheetGenerator {
 
 
     enableCropMode() {
+
         if (!this.extractedFrames.length) return;
         if (this.cropBtn) {
             this.cropBtn.disabled = true;
@@ -953,11 +961,13 @@ class SpritesheetGenerator {
                 const ctx = this.cropCanvas.getContext('2d');
                 ctx.drawImage(img, 0, 0);
             }
+
             if (this.gridCanvas) {
                 this.gridCanvas.width = img.width;
                 this.gridCanvas.height = img.height;
                 this.drawGrid();
             }
+
             const rect = this.cropCanvas.getBoundingClientRect();
             const startWidth = rect.width * 0.5;
             const startHeight = rect.height * 0.5;
@@ -965,6 +975,7 @@ class SpritesheetGenerator {
             const startY = (rect.height - startHeight) / 2;
             this.cropBoxData = { x: startX, y: startY, width: startWidth, height: startHeight };
             this.currentAspect = null;
+
             this.aspectLocked = false;
             this.cropTransform = { rotation: 0, flipH: false, flipV: false };
             if (this.cropRatioSelect) {
@@ -973,6 +984,7 @@ class SpritesheetGenerator {
             if (this.lockAspect) {
                 this.lockAspect.checked = false;
             }
+
             this.updateCropBoxUI();
             if (this.cropOverlay && this.cropBox) {
                 this.cropOverlay.classList.remove('hidden');
@@ -980,6 +992,7 @@ class SpritesheetGenerator {
             }
             this.isCropping = true;
             this.showWarning('Drag or resize selection, then confirm');
+
         };
         img.src = this.extractedFrames[0];
     }
@@ -1073,6 +1086,7 @@ class SpritesheetGenerator {
 
     updateCropBoxUI() {
         if (!this.cropBox) return;
+
         const { x, y, width, height } = this.cropBoxData;
         this.cropBox.style.left = `${x}px`;
         this.cropBox.style.top = `${y}px`;
@@ -1155,6 +1169,7 @@ class SpritesheetGenerator {
         } else if (dir === 'v') {
             this.cropTransform.flipV = !this.cropTransform.flipV;
         }
+
     }
 
     confirmCropSelection() {
@@ -1170,10 +1185,12 @@ class SpritesheetGenerator {
             y: Math.round(this.cropBoxData.y * scaleY),
             width: Math.round(this.cropBoxData.width * scaleX),
             height: Math.round(this.cropBoxData.height * scaleY)
+
         };
         const transform = { ...this.cropTransform };
         this.hideCropOverlay();
         this.cropSpritesheet(region, transform);
+
     }
 
     cancelCropSelection() {
@@ -1184,15 +1201,18 @@ class SpritesheetGenerator {
     }
 
     hideCropOverlay() {
+
         if (this.cropOverlay) {
             this.cropOverlay.classList.add('hidden');
         }
         if (this.cropBox) {
             this.cropBox.classList.add('hidden');
         }
+
         if (this.gridCanvas) {
             this.gridCanvas.classList.add('hidden');
         }
+
         this.isCropping = false;
         this.cropBoxData = null;
         this.isDraggingCrop = false;
@@ -1205,6 +1225,7 @@ class SpritesheetGenerator {
     async cropSpritesheet(region, transform) {
         const sourceFrames = this.originalFrames.length ? this.originalFrames : this.extractedFrames;
         if (!sourceFrames.length) {
+
             this.showError('No frames available to crop');
             return;
         }
@@ -1219,6 +1240,7 @@ class SpritesheetGenerator {
             this.cropBtn.disabled = true;
         }
 
+
         const angle = ((transform.rotation % 360) + 360) % 360;
         let outWidth = width;
         let outHeight = height;
@@ -1229,6 +1251,7 @@ class SpritesheetGenerator {
 
         const croppedFrames = [];
         for (const frameData of sourceFrames) {
+
             const img = new Image();
             await new Promise((resolve, reject) => {
                 img.onload = resolve;
@@ -1236,6 +1259,7 @@ class SpritesheetGenerator {
                 img.src = frameData;
             });
             const canvas = document.createElement('canvas');
+
             canvas.width = outWidth;
             canvas.height = outHeight;
             const ctx = canvas.getContext('2d');
@@ -1245,12 +1269,15 @@ class SpritesheetGenerator {
             ctx.rotate((angle * Math.PI) / 180);
             ctx.drawImage(img, x, y, width, height, -width / 2, -height / 2, width, height);
             ctx.restore();
+
             croppedFrames.push(canvas.toDataURL('image/png', 1.0));
         }
 
         const settings = this.getCurrentSettings();
+
         settings.spriteWidth = outWidth;
         settings.spriteHeight = outHeight;
+
         const spritesheets = await this.createSpritesheets(croppedFrames, settings);
         this.extractedFrames = croppedFrames;
         this.spritesheet = spritesheets;

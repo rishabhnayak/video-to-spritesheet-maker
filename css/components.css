@@ -960,11 +960,13 @@ input[type="file"] {
     position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, 0.65);
+
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 1000;
 }
+
 
 .crop-modal {
     display: flex;
@@ -975,9 +977,11 @@ input[type="file"] {
 
 .crop-container {
     position: relative;
+
     max-width: 90vw;
     max-height: 80vh;
 }
+
 
 .crop-container canvas {
     max-width: 100%;
@@ -987,18 +991,22 @@ input[type="file"] {
 
 .crop-box {
     position: absolute;
+
     border: 2px solid #00e0ff;
     box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.65);
     cursor: move;
     will-change: transform;
+
 }
 
 .crop-box .handle {
     position: absolute;
+
     width: 10px;
     height: 10px;
     background: #ffffff;
     border: 2px solid #00e0ff;
+
     box-sizing: border-box;
 }
 
@@ -1066,4 +1074,5 @@ input[type="file"] {
     display: flex;
     align-items: center;
     gap: var(--space-4);
+
 }

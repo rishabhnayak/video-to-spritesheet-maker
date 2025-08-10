@@ -241,11 +241,13 @@
 
     <div id="cropOverlay" class="crop-overlay hidden">
         <div class="crop-modal">
+
             <div class="crop-container">
                 <canvas id="cropCanvas"></canvas>
                 <canvas id="gridCanvas" class="grid-overlay hidden"></canvas>
                 <div id="cropBox" class="crop-box hidden">
                     <span id="cropLabel" class="crop-label"></span>
+
                     <div class="handle handle-n"></div>
                     <div class="handle handle-e"></div>
                     <div class="handle handle-s"></div>
@@ -261,6 +263,7 @@
                     <label for="cropRatio">Aspect Ratio</label>
                     <select id="cropRatio" class="form-control">
                         <option value="free">Free</option>
+
                         <option value="1:1">Square 1:1</option>
                         <option value="4:5">Portrait 4:5</option>
                         <option value="4:3">Photo 4:3</option>
@@ -299,10 +302,12 @@
                     <button type="button" class="btn btn--sm" id="flipHBtn">Flip H</button>
                     <button type="button" class="btn btn--sm" id="flipVBtn">Flip V</button>
                 </div>
+
                 <div class="crop-actions">
                     <button type="button" class="btn btn--primary" id="confirmCropBtn">Confirm Crop</button>
                     <button type="button" class="btn btn--secondary" id="cancelCropBtn">Cancel</button>
                 </div>
+
             </div>
         </div>
     </div>
