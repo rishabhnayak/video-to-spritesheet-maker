@@ -93,6 +93,12 @@ class SpritesheetGenerator {
         this.cropImage = document.getElementById('cropImage');
         this.cropArea = document.getElementById('cropArea');
         this.cropContainer = document.getElementById('cropContainer');
+        // If cropContainer does not exist, create and append it to cropPopup
+        if (!this.cropContainer && this.cropPopup) {
+            this.cropContainer = document.createElement('div');
+            this.cropContainer.id = 'cropContainer';
+            this.cropPopup.appendChild(this.cropContainer);
+        }
         if (!this.cropArea) {
             this.cropArea = document.createElement('div');
             this.cropArea.id = 'cropArea';
