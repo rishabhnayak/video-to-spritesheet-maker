@@ -59,6 +59,9 @@
                             <span id="videoFrameRate"></span>
                         </div>
                     </div>
+                    <div class="video-actions">
+                        <button type="button" class="btn btn--secondary" id="cropBtn">Crop Video</button>
+                    </div>
                 </div>
             </section>
 
@@ -229,6 +232,22 @@
                 </div>
             </section>
         </main>
+    </div>
+
+    <div id="cropPopup" class="crop-popup hidden">
+        <div class="card crop-card">
+            <div class="card__body">
+                <h3>Crop Video</h3>
+                <div class="crop-container" id="cropContainer">
+                    <img id="cropImage" alt="Video frame for cropping">
+                    <div id="cropArea" class="crop-area hidden"></div>
+                </div>
+                <div class="crop-actions">
+                    <button type="button" class="btn btn--primary" id="applyCropBtn">Apply</button>
+                    <button type="button" class="btn btn--secondary" id="cancelCropBtn">Cancel</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="app.js"></script>
