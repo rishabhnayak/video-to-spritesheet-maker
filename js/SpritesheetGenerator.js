@@ -16,6 +16,9 @@ class SpritesheetGenerator {
         this.videoCtx = null;
         this.videoTransparencyFrame = null;
 
+        // Animation preview state
+        this.animationFrameRequest = null;
+
         // Cropping state
         this.isCropping = false;
 
@@ -90,6 +93,7 @@ class SpritesheetGenerator {
         this.sheetSize = document.getElementById('sheetSize');
         this.previewSize = document.getElementById('previewSize');
         this.previewCanvasEl = document.getElementById('previewCanvas');
+        this.animationPreview = document.getElementById('animationPreview');
         this.canvasWrapper = document.getElementById('canvasWrapper');
         this.zoomInBtn = document.getElementById('zoomInBtn');
         this.zoomOutBtn = document.getElementById('zoomOutBtn');
@@ -658,6 +662,14 @@ class SpritesheetGenerator {
         this.cancelGeneration = false;
         this.extractedFrames = [];
 
+        if (this.animationPreview) {
+            this.animationPreview.classList.add('hidden');
+        }
+        if (this.animationFrameRequest) {
+            cancelAnimationFrame(this.animationFrameRequest);
+            this.animationFrameRequest = null;
+        }
+
         try {
             this.showGenerationProgress();
             
@@ -958,43 +970,49 @@ class SpritesheetGenerator {
             this.previewSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
-        this.createGifPreview(this.extractedFrames, settings.fps);
+        this.createAnimationPreview(this.extractedFrames, settings.fps);
     }
 
-    createGifPreview(frames, fps) {
-        const previewImg = document.getElementById('gifPreview');
-        if (!previewImg || !frames.length || typeof GIF === 'undefined') return;
+    createAnimationPreview(frames, fps) {
+        if (!this.animationPreview || !frames.length) return;
 
-        // Hide previous preview while generating a new one
-        previewImg.classList.add('hidden');
+        const canvas = this.animationPreview;
+        const ctx = canvas.getContext('2d');
 
-        const gif = new GIF({
-            workers: 2,
-            quality: 10,
-            workerScript: 'https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.worker.js'
+        // Preload images
+        const images = frames.map(src => {
+            const img = new Image();
+            img.src = src;
+            return img;
         });
 
-        // Ensure each frame is loaded before adding to the GIF to prevent blank previews
-        const loadPromises = frames.map(frame => {
-            return new Promise(resolve => {
-                const img = new Image();
-                img.onload = () => {
-                    gif.addFrame(img, { delay: 1000 / fps });
-                    resolve();
-                };
-                img.src = frame;
-            });
-        });
+        // Wait for first image to load to set canvas size
+        images[0].onload = () => {
+            canvas.width = images[0].width;
+            canvas.height = images[0].height;
+            canvas.style.width = images[0].width + 'px';
+            canvas.style.height = images[0].height + 'px';
+            canvas.classList.remove('hidden');
 
-        Promise.all(loadPromises).then(() => {
-            gif.on('finished', blob => {
-                const url = URL.createObjectURL(blob);
-                previewImg.src = url;
-                previewImg.classList.remove('hidden');
-            });
+            let frameIndex = 0;
+            let lastTime = 0;
+            const frameDuration = 1000 / fps;
 
-            gif.render();
-        });
+            const animate = (timestamp) => {
+                if (timestamp - lastTime >= frameDuration) {
+                    const image = images[frameIndex];
+                    if (image.complete) {
+                        ctx.clearRect(0, 0, canvas.width, canvas.height);
+                        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+                    }
+                    frameIndex = (frameIndex + 1) % images.length;
+                    lastTime = timestamp;
+                }
+                this.animationFrameRequest = requestAnimationFrame(animate);
+            };
+
+            this.animationFrameRequest = requestAnimationFrame(animate);
+        };
     }
 
 
