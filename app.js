@@ -95,6 +95,15 @@ class SpritesheetGenerator {
         this.cropContainer = document.getElementById('cropContainer');
         this.applyCropBtn = document.getElementById('applyCropBtn');
         this.cancelCropBtn = document.getElementById('cancelCropBtn');
+        // If cancelCropBtn does not exist, create and append it to cropPopup
+        if (!this.cancelCropBtn && this.cropPopup) {
+            this.cancelCropBtn = document.createElement('button');
+            this.cancelCropBtn.id = 'cancelCropBtn';
+            this.cancelCropBtn.type = 'button';
+            this.cancelCropBtn.textContent = 'Cancel';
+            this.cancelCropBtn.className = 'btn btn-secondary';
+            this.cropPopup.appendChild(this.cancelCropBtn);
+        }
 
         this.cropRegion = null;
         this.currentCrop = null;
