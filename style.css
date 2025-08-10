@@ -1266,6 +1266,18 @@ select.form-control {
     }
 }
 
+/* GIF preview */
+.gif-preview {
+    margin-top: var(--space-16);
+    text-align: center;
+}
+
+.gif-preview img {
+    max-width: 100%;
+    height: auto;
+    image-rendering: pixelated;
+}
+
 /* Hidden utility */
 .hidden {
     display: none !important;

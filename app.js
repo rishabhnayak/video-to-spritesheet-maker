@@ -73,6 +73,8 @@ class SpritesheetGenerator {
         this.resetZoomBtn = document.getElementById('resetZoomBtn');
         this.exportBtn = document.getElementById('exportBtn');
         this.exportStatus = document.getElementById('exportStatus');
+        this.gifPreview = document.getElementById('gifPreview');
+        this.gifPreviewImg = document.getElementById('gifPreviewImg');
 
         // Time range elements
         this.startTime = document.getElementById('startTime');
@@ -676,6 +678,12 @@ class SpritesheetGenerator {
         this.isGenerating = true;
         this.cancelGeneration = false;
         this.extractedFrames = [];
+        if (this.gifPreview) {
+            this.gifPreview.classList.add('hidden');
+            if (this.gifPreviewImg) {
+                this.gifPreviewImg.src = '';
+            }
+        }
 
         try {
             this.showGenerationProgress();
@@ -700,6 +708,7 @@ class SpritesheetGenerator {
             this.displaySpritesheet(spritesheets, settings);
             this.hideGenerationProgress();
             this.showSuccess('Spritesheet generated successfully!');
+            this.generatePreviewGif(frames, settings);
 
         } catch (error) {
             console.error('Generation error:', error);
@@ -956,6 +965,34 @@ class SpritesheetGenerator {
         if (this.previewSection) {
             this.previewSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
+    }
+
+    async generatePreviewGif(frames, settings) {
+        if (!this.gifPreview || !this.gifPreviewImg || !frames.length) return;
+
+        const gif = new GIF({
+            workers: 2,
+            quality: 10,
+            workerScript: 'https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.worker.js'
+        });
+
+        for (const frame of frames) {
+            const img = new Image();
+            await new Promise((resolve, reject) => {
+                img.onload = resolve;
+                img.onerror = reject;
+                img.src = frame;
+            });
+            gif.addFrame(img, { delay: 1000 / (settings.fps || 30) });
+        }
+
+        gif.on('finished', (blob) => {
+            const url = URL.createObjectURL(blob);
+            this.gifPreviewImg.src = url;
+            this.gifPreview.classList.remove('hidden');
+        });
+
+        gif.render();
     }
 
     async seekToTime(video, time) {

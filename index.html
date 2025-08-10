@@ -221,6 +221,10 @@
                             <canvas id="previewCanvas"></canvas>
                         </div>
                     </div>
+                    <div class="gif-preview hidden" id="gifPreview">
+                        <h3>Animation Preview</h3>
+                        <img id="gifPreviewImg" alt="Animation preview">
+                    </div>
                     <div class="export-controls">
                         <button type="button" class="btn btn--primary btn--full-width" id="exportBtn">
                             Export PNG (Full Resolution)
@@ -234,21 +238,8 @@
         </main>
     </div>
 
-    <div id="cropPopup" class="crop-popup hidden">
-        <div class="card crop-card">
-            <div class="card__body">
-                <h3>Crop Video</h3>
-                <div class="crop-container" id="cropContainer">
-                    <img id="cropImage" alt="Video frame for cropping">
-                    <div id="cropArea" class="crop-area hidden"></div>
-                </div>
-                <div class="crop-actions">
-                    <button type="button" class="btn btn--primary" id="applyCropBtn">Apply</button>
-                    <button type="button" class="btn btn--secondary" id="cancelCropBtn">Cancel</button>
-                </div>
-            </div>
-        </div>
-    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.js"></script>
 
     <script src="app.js"></script>
 </body>
