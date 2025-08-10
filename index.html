@@ -241,10 +241,35 @@
 
     <div id="cropOverlay" class="crop-overlay hidden">
         <div class="crop-modal">
-            <canvas id="cropCanvas"></canvas>
-            <div class="crop-actions">
-                <button type="button" class="btn btn--primary" id="confirmCropBtn">Confirm Crop</button>
-                <button type="button" class="btn btn--secondary" id="cancelCropBtn">Cancel</button>
+
+            <div class="crop-container">
+                <canvas id="cropCanvas"></canvas>
+                <div id="cropBox" class="crop-box hidden">
+                    <div class="handle handle-n"></div>
+                    <div class="handle handle-e"></div>
+                    <div class="handle handle-s"></div>
+                    <div class="handle handle-w"></div>
+                    <div class="handle handle-ne"></div>
+                    <div class="handle handle-nw"></div>
+                    <div class="handle handle-se"></div>
+                    <div class="handle handle-sw"></div>
+                </div>
+            </div>
+            <div class="crop-controls">
+                <div class="ratio-select">
+                    <label for="cropRatio">Aspect Ratio</label>
+                    <select id="cropRatio" class="form-control">
+                        <option value="free">Free</option>
+                        <option value="1:1">1:1</option>
+                        <option value="4:3">4:3</option>
+                        <option value="16:9">16:9</option>
+                    </select>
+                </div>
+                <div class="crop-actions">
+                    <button type="button" class="btn btn--primary" id="confirmCropBtn">Confirm Crop</button>
+                    <button type="button" class="btn btn--secondary" id="cancelCropBtn">Cancel</button>
+                </div>
+
             </div>
         </div>
     </div>

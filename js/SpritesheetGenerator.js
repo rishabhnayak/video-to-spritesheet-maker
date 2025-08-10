@@ -17,11 +17,14 @@ class SpritesheetGenerator {
 
         // Cropping state
         this.isCropping = false;
-        this.cropStart = null;
-        this.cropRect = null;
 
-        this.cropCanvasEl = null;
-        this.cropImage = null;
+        this.cropBoxData = null;
+        this.isDraggingCrop = false;
+        this.isResizingCrop = false;
+        this.activeHandle = null;
+        this.dragStart = null;
+        this.startBox = null;
+        this.currentAspect = null;
 
         
         this.initializeElements();
@@ -94,6 +97,10 @@ class SpritesheetGenerator {
         // Crop overlay elements
         this.cropOverlay = document.getElementById('cropOverlay');
         this.cropCanvas = document.getElementById('cropCanvas');
+
+        this.cropBox = document.getElementById('cropBox');
+        this.cropRatioSelect = document.getElementById('cropRatio');
+
         this.confirmCropBtn = document.getElementById('confirmCropBtn');
         this.cancelCropBtn = document.getElementById('cancelCropBtn');
 
@@ -239,11 +246,19 @@ class SpritesheetGenerator {
             this.cropBtn.addEventListener('click', () => this.enableCropMode());
         }
 
-        if (this.cropCanvas) {
-            this.cropCanvas.addEventListener('mousedown', (e) => this.handleCanvasMouseDown(e));
-            this.cropCanvas.addEventListener('mousemove', (e) => this.handleCanvasMouseMove(e));
+
+        if (this.cropBox) {
+            this.cropBox.addEventListener('mousedown', (e) => this.startCropInteraction(e));
         }
-        document.addEventListener('mouseup', (e) => this.handleCanvasMouseUp(e));
+        if (this.cropOverlay) {
+            this.cropOverlay.addEventListener('mousemove', (e) => this.handleCropInteraction(e));
+        }
+        document.addEventListener('mouseup', () => this.endCropInteraction());
+
+        if (this.cropRatioSelect) {
+            this.cropRatioSelect.addEventListener('change', () => this.updateCropAspect());
+        }
+
 
         if (this.confirmCropBtn) {
             this.confirmCropBtn.addEventListener('click', () => this.confirmCropSelection());
@@ -891,89 +906,138 @@ class SpritesheetGenerator {
                 const ctx = this.cropCanvas.getContext('2d');
                 ctx.drawImage(img, 0, 0);
             }
-            this.cropImage = img;
-            this.cropStart = null;
-            this.cropRect = null;
-            this.cropCanvasEl = this.cropCanvas;
-            if (this.cropOverlay) {
-                this.cropOverlay.classList.remove('hidden');
+
+            const rect = this.cropCanvas.getBoundingClientRect();
+            const startWidth = rect.width * 0.5;
+            const startHeight = rect.height * 0.5;
+            const startX = (rect.width - startWidth) / 2;
+            const startY = (rect.height - startHeight) / 2;
+            this.cropBoxData = { x: startX, y: startY, width: startWidth, height: startHeight };
+            this.currentAspect = null;
+            if (this.cropRatioSelect) {
+                this.cropRatioSelect.value = 'free';
             }
-            this.showWarning('Drag to select region, then confirm');
+            this.updateCropBoxUI();
+            if (this.cropOverlay && this.cropBox) {
+                this.cropOverlay.classList.remove('hidden');
+                this.cropBox.classList.remove('hidden');
+            }
             this.isCropping = true;
+            this.showWarning('Drag or resize selection, then confirm');
+
         };
         img.src = this.extractedFrames[0];
     }
 
-    handleCanvasMouseDown(e) {
-        if (!this.isCropping || !this.cropCanvasEl) return;
-        const rect = this.cropCanvasEl.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        this.cropStart = { x, y };
-        this.cropRect = { x, y, width: 0, height: 0 };
-        this.drawCropOverlay();
+    startCropInteraction(e) {
+        if (!this.isCropping || !this.cropBox) return;
+        e.preventDefault();
+        const handle = e.target.classList.contains('handle') ? e.target.classList[1].replace('handle-', '') : null;
+        if (handle) {
+            this.isResizingCrop = true;
+            this.activeHandle = handle;
+        } else {
+            this.isDraggingCrop = true;
+        }
+        this.dragStart = { x: e.clientX, y: e.clientY };
+        this.startBox = { ...this.cropBoxData };
     }
 
-    handleCanvasMouseMove(e) {
+    handleCropInteraction(e) {
+        if (!this.isCropping || (!this.isDraggingCrop && !this.isResizingCrop)) return;
+        const dx = e.clientX - this.dragStart.x;
+        const dy = e.clientY - this.dragStart.y;
+        let { x, y, width, height } = this.startBox;
+        const canvasRect = this.cropCanvas.getBoundingClientRect();
+        const maxWidth = canvasRect.width;
+        const maxHeight = canvasRect.height;
+        const aspect = this.currentAspect;
 
-        if (!this.isCropping || !this.cropStart || !this.cropCanvasEl) return;
-        const rect = this.cropCanvasEl.getBoundingClientRect();
-
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        this.cropRect = {
-            x: Math.min(x, this.cropStart.x),
-            y: Math.min(y, this.cropStart.y),
-            width: Math.abs(x - this.cropStart.x),
-            height: Math.abs(y - this.cropStart.y)
-        };
-        this.drawCropOverlay();
+        if (this.isDraggingCrop) {
+            x = Math.min(Math.max(0, this.startBox.x + dx), maxWidth - width);
+            y = Math.min(Math.max(0, this.startBox.y + dy), maxHeight - height);
+        } else if (this.isResizingCrop) {
+            if (this.activeHandle.includes('e')) {
+                width = Math.min(Math.max(20, this.startBox.width + dx), maxWidth - x);
+            }
+            if (this.activeHandle.includes('s')) {
+                height = Math.min(Math.max(20, this.startBox.height + dy), maxHeight - y);
+            }
+            if (this.activeHandle.includes('w')) {
+                x = Math.min(Math.max(0, this.startBox.x + dx), this.startBox.x + this.startBox.width - 20);
+                width = this.startBox.width - (x - this.startBox.x);
+            }
+            if (this.activeHandle.includes('n')) {
+                y = Math.min(Math.max(0, this.startBox.y + dy), this.startBox.y + this.startBox.height - 20);
+                height = this.startBox.height - (y - this.startBox.y);
+            }
+            if (aspect) {
+                if (this.activeHandle.includes('e') || this.activeHandle.includes('w')) {
+                    height = width / aspect;
+                    if (this.activeHandle.includes('n')) {
+                        y = this.startBox.y + this.startBox.height - height;
+                    }
+                } else if (this.activeHandle.includes('n') || this.activeHandle.includes('s')) {
+                    width = height * aspect;
+                    if (this.activeHandle.includes('w')) {
+                        x = this.startBox.x + this.startBox.width - width;
+                    }
+                }
+                if (x + width > maxWidth) {
+                    width = maxWidth - x;
+                    height = width / aspect;
+                }
+                if (y + height > maxHeight) {
+                    height = maxHeight - y;
+                    width = height * aspect;
+                }
+            }
+        }
+        this.cropBoxData = { x, y, width, height };
+        this.updateCropBoxUI();
     }
 
-    handleCanvasMouseUp(e) {
-        if (!this.isCropping) return;
-        this.isCropping = false;
-        if (!this.cropRect || this.cropRect.width < 5 || this.cropRect.height < 5) {
-            this.clearCropOverlay();
+    endCropInteraction() {
+        this.isDraggingCrop = false;
+        this.isResizingCrop = false;
+        this.activeHandle = null;
+    }
 
-            this.cropRect = null;
+    updateCropAspect() {
+        if (!this.cropRatioSelect || !this.cropBoxData) return;
+        const value = this.cropRatioSelect.value;
+        if (value === 'free') {
+            this.currentAspect = null;
             return;
         }
-        this.cropStart = null;
-        this.drawCropOverlay();
+        const [w, h] = value.split(':').map(Number);
+        this.currentAspect = w / h;
+        this.cropBoxData.height = this.cropBoxData.width / this.currentAspect;
+        this.updateCropBoxUI();
     }
 
-    drawCropOverlay() {
-        if (!this.cropCanvasEl || !this.cropImage) return;
-        const ctx = this.cropCanvasEl.getContext('2d');
-        ctx.clearRect(0, 0, this.cropCanvasEl.width, this.cropCanvasEl.height);
-        ctx.drawImage(this.cropImage, 0, 0);
-
-        if (this.cropRect) {
-            ctx.strokeStyle = 'red';
-            ctx.lineWidth = 2;
-            ctx.strokeRect(this.cropRect.x, this.cropRect.y, this.cropRect.width, this.cropRect.height);
-        }
-    }
-
-    clearCropOverlay() {
-
-        if (!this.cropCanvasEl || !this.cropImage) return;
-        const ctx = this.cropCanvasEl.getContext('2d');
-        ctx.clearRect(0, 0, this.cropCanvasEl.width, this.cropCanvasEl.height);
-        ctx.drawImage(this.cropImage, 0, 0);
+    updateCropBoxUI() {
+        if (!this.cropBox) return;
+        this.cropBox.style.left = `${this.cropBoxData.x}px`;
+        this.cropBox.style.top = `${this.cropBoxData.y}px`;
+        this.cropBox.style.width = `${this.cropBoxData.width}px`;
+        this.cropBox.style.height = `${this.cropBoxData.height}px`;
     }
 
     confirmCropSelection() {
-        if (!this.cropRect) {
+        if (!this.cropBoxData) {
             this.showError('Please select a crop region');
             return;
         }
+        const canvasRect = this.cropCanvas.getBoundingClientRect();
+        const scaleX = this.cropCanvas.width / canvasRect.width;
+        const scaleY = this.cropCanvas.height / canvasRect.height;
         const region = {
-            x: Math.round(this.cropRect.x),
-            y: Math.round(this.cropRect.y),
-            width: Math.round(this.cropRect.width),
-            height: Math.round(this.cropRect.height)
+            x: Math.round(this.cropBoxData.x * scaleX),
+            y: Math.round(this.cropBoxData.y * scaleY),
+            width: Math.round(this.cropBoxData.width * scaleX),
+            height: Math.round(this.cropBoxData.height * scaleY)
+
         };
         this.hideCropOverlay();
         this.cropSpritesheet(region);
@@ -987,16 +1051,20 @@ class SpritesheetGenerator {
     }
 
     hideCropOverlay() {
-        this.clearCropOverlay();
+
         if (this.cropOverlay) {
             this.cropOverlay.classList.add('hidden');
         }
+        if (this.cropBox) {
+            this.cropBox.classList.add('hidden');
+        }
         this.isCropping = false;
-        this.cropCanvasEl = null;
-        this.cropImage = null;
-        this.cropStart = null;
-        this.cropRect = null;
-
+        this.cropBoxData = null;
+        this.isDraggingCrop = false;
+        this.isResizingCrop = false;
+        this.activeHandle = null;
+        this.dragStart = null;
+        this.startBox = null;
     }
 
     async cropSpritesheet(region) {
