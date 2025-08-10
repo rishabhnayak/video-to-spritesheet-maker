@@ -955,6 +955,7 @@ class SpritesheetGenerator {
         const previewImg = document.getElementById('gifPreview');
         if (!previewImg || !frames.length || typeof GIF === 'undefined') return;
 
+        // Hide previous preview while generating a new one
         previewImg.classList.add('hidden');
 
         const gif = new GIF({
@@ -963,19 +964,27 @@ class SpritesheetGenerator {
             workerScript: 'https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.worker.js'
         });
 
-        frames.forEach(frame => {
-            const img = document.createElement('img');
-            img.src = frame;
-            gif.addFrame(img, { delay: 1000 / fps });
+        // Ensure each frame is loaded before adding to the GIF to prevent blank previews
+        const loadPromises = frames.map(frame => {
+            return new Promise(resolve => {
+                const img = new Image();
+                img.onload = () => {
+                    gif.addFrame(img, { delay: 1000 / fps });
+                    resolve();
+                };
+                img.src = frame;
+            });
         });
 
-        gif.on('finished', blob => {
-            const url = URL.createObjectURL(blob);
-            previewImg.src = url;
-            previewImg.classList.remove('hidden');
-        });
+        Promise.all(loadPromises).then(() => {
+            gif.on('finished', blob => {
+                const url = URL.createObjectURL(blob);
+                previewImg.src = url;
+                previewImg.classList.remove('hidden');
+            });
 
-        gif.render();
+            gif.render();
+        });
     }
 
 
