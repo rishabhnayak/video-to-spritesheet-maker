@@ -1,24 +1,30 @@
 :root {
-  --bs-primary: #5d87ff;
-  --bs-primary-rgb: 93,135,255;
-  --bs-body-font-family: 'Inter', sans-serif;
+
+  --bs-primary: #2196f3;
+  --bs-primary-rgb: 33,150,243;
+  --bs-body-font-family: 'Roboto', sans-serif;
 }
 
 .header-bg {
-  background: linear-gradient(135deg, #5d87ff, #884dff);
+  background: linear-gradient(135deg, #2196f3, #1976d2);
+
   color: #fff;
   padding: 4rem 0;
 }
 
 .card {
   border: none;
-  border-radius: 1rem;
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.05);
+
+  border-radius: 0.75rem;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+
 }
 
 .drop-zone {
   border: 2px dashed var(--bs-primary);
-  border-radius: 1rem;
+
+  border-radius: 0.75rem;
+
   padding: 3rem 1rem;
   text-align: center;
   cursor: pointer;
