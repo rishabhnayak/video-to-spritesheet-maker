@@ -111,12 +111,10 @@
                             <p class="text-secondary" id="settingsHelp">Upload a video first to enable generation settings</p>
                             <div class="settings-grid" id="settingsGrid">
                                 <div class="setting-group">
-                                    <label class="form-label" for="fpsSlider">
-                                        Frame Rate: <span id="fpsValue">30</span> FPS
-                                    </label>
+                                    <label class="form-label" for="fpsSlider">Frame Rate <span id="fpsValue" class="ms-1">30</span> FPS</label>
                                     <div class="d-flex align-items-center gap-2">
-                                        <input type="range" id="fpsSlider" class="form-range flex-grow-1" min="24" max="120" value="30" step="1">
-                                        <input type="number" id="fpsInput" class="form-control w-auto" min="24" max="120" value="30">
+                                        <input type="range" id="fpsSlider" class="form-range flex-grow-1 slim-range" min="24" max="120" value="30" step="1">
+                                        <input type="number" id="fpsInput" class="form-control input-chip" min="24" max="120" value="30">
                                     </div>
                                     <div class="d-flex justify-content-between small">
                                         <span>24</span>
@@ -127,15 +125,13 @@
 
                                 <div class="setting-group">
                                     <label class="form-label">Time Range</label>
-                                    <div class="row g-2">
-                                        <div class="col">
-                                            <label class="form-label small">Start Time (seconds)</label>
-                                            <input type="number" id="startTime" class="form-control" min="0" step="0.1" placeholder="0" value="0">
-                                        </div>
-                                        <div class="col">
-                                            <label class="form-label small">End Time (seconds)</label>
-                                            <input type="number" id="endTime" class="form-control" min="0" step="0.1" placeholder="Auto">
-                                        </div>
+                                    <div class="time-range-sliders">
+                                        <input type="range" id="startRange" class="form-range slim-range" min="0" max="0" step="0.1" value="0">
+                                        <input type="range" id="endRange" class="form-range slim-range" min="0" max="0" step="0.1" value="0">
+                                    </div>
+                                    <div class="time-range-inputs">
+                                        <input type="number" id="startTime" class="form-control input-chip" min="0" step="0.1" placeholder="0" value="0">
+                                        <input type="number" id="endTime" class="form-control input-chip" min="0" step="0.1" placeholder="Auto">
                                     </div>
                                     <div class="time-range-info">
                                         <small class="text-secondary" id="timeRangeInfo">Full video duration will be used</small>
@@ -144,7 +140,16 @@
 
                                 <div class="setting-group">
                                     <label class="form-label" for="resolutionSelect">Sprite Resolution</label>
-                                    <select id="resolutionSelect" class="form-select">
+                                    <div class="resolution-pills" id="resolutionPills">
+                                        <button type="button" class="resolution-pill active" data-value="same">Same as video</button>
+                                        <button type="button" class="resolution-pill" data-value="64">64×64</button>
+                                        <button type="button" class="resolution-pill" data-value="128">128×128</button>
+                                        <button type="button" class="resolution-pill" data-value="256">256×256</button>
+                                        <button type="button" class="resolution-pill" data-value="512">512×512</button>
+                                        <button type="button" class="resolution-pill" data-value="1024">1024×1024</button>
+                                        <button type="button" class="resolution-pill" data-value="custom">Custom</button>
+                                    </div>
+                                    <select id="resolutionSelect" class="form-select d-none">
                                         <option value="same">Same as video</option>
                                         <option value="64">64×64</option>
                                         <option value="128">128×128</option>
@@ -170,12 +175,15 @@
                                 </div>
 
                                 <div class="setting-group">
-                                    <label class="form-label" for="gridModeSelect">Grid Mode</label>
-                                    <select id="gridModeSelect" class="form-select">
-                                        <option value="columns">Calculate Columns</option>
-                                        <option value="rows">Calculate Rows</option>
-                                        <option value="custom">Custom</option>
-                                    </select>
+                                    <label class="form-label">Grid Mode</label>
+                                    <div class="segmented-control" id="gridModeControl">
+                                        <input type="radio" id="gridColumns" name="gridMode" value="columns" checked>
+                                        <label for="gridColumns">Calculate Columns</label>
+                                        <input type="radio" id="gridRows" name="gridMode" value="rows">
+                                        <label for="gridRows">Fixed Rows</label>
+                                        <input type="radio" id="gridCustom" name="gridMode" value="custom">
+                                        <label for="gridCustom">Custom</label>
+                                    </div>
                                 </div>
 
                                 <div class="setting-group hidden" id="customColumnsGroup">
@@ -194,7 +202,7 @@
 
                         <div class="d-flex gap-2 mt-4" id="generationControls">
                             <button type="button" class="btn btn-primary" id="generateBtn">Generate Spritesheet</button>
-                            <button type="button" class="btn btn-secondary" id="cancelBtn">Cancel</button>
+                            <button type="button" class="btn btn-outline-secondary" id="cancelBtn">Cancel</button>
                         </div>
 
                         <div class="progress mt-3 hidden" id="progressContainer">

@@ -273,13 +273,32 @@ body {
 /* Settings grid */
 .settings-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(12, 1fr);
   gap: var(--space-4);
+}
+
+.setting-group {
+  grid-column: span 6;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+@media (max-width: 1024px) {
+  .settings-grid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+  .setting-group {
+    grid-column: span 3;
+  }
 }
 
 @media (max-width: 767px) {
   .settings-grid {
     grid-template-columns: 1fr;
+  }
+  .setting-group {
+    grid-column: auto;
   }
 }
 
@@ -302,6 +321,120 @@ body {
 /* Crop overlay */
 .crop-overlay {
   background: rgba(0,0,0,0.6);
+}
+
+/* Modern controls */
+.slim-range {
+  height: 6px;
+}
+.slim-range::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: var(--radius-full);
+}
+.slim-range::-webkit-slider-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  border: none;
+  margin-top: -5px;
+}
+.slim-range::-moz-range-track {
+  height: 6px;
+  border-radius: var(--radius-full);
+}
+.slim-range::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  border: none;
+}
+
+.input-chip {
+  width: 72px;
+  text-align: center;
+  border-radius: var(--radius-full);
+  padding: 2px var(--space-2);
+}
+
+.time-range-sliders {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.time-range-inputs {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.resolution-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.resolution-pill {
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  font-size: var(--font-sm);
+  cursor: pointer;
+  transition: background var(--motion-fast) var(--motion-easing);
+}
+
+.resolution-pill:hover {
+  background: var(--color-secondary);
+}
+
+.resolution-pill.active {
+  background: var(--color-primary);
+  color: var(--color-primary-foreground);
+  border-color: var(--color-primary);
+}
+
+.segmented-control {
+  display: inline-flex;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.segmented-control input {
+  display: none;
+}
+
+.segmented-control label {
+  padding: var(--space-1) var(--space-3);
+  cursor: pointer;
+  user-select: none;
+  font-size: var(--font-sm);
+}
+
+.segmented-control label:hover {
+  background: var(--color-secondary);
+}
+
+.segmented-control input:checked + label {
+  background: var(--color-primary);
+  color: var(--color-primary-foreground);
+}
+
+#generationControls .btn {
+  height: 44px;
+}
+
+@media (max-width: 767px) {
+  #generationControls {
+    position: sticky;
+    bottom: 0;
+    background: var(--color-elevated);
+    padding: var(--space-4);
+    border-top: 1px solid var(--color-border);
+    margin-top: var(--space-6);
+  }
 }
 
 @media (max-width: 767px) {
