@@ -94,6 +94,18 @@ body {
     color var(--motion-normal) var(--motion-easing);
 }
 
+/* Global cards */
+.card {
+  background: var(--color-elevated);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+}
+
 /* Header */
 .app-header {
   position: sticky;
@@ -156,6 +168,12 @@ body {
   outline: 2px solid var(--color-focus);
 }
 
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
 /* Title bar */
 .title-bar {
   padding: var(--space-6) 0 var(--space-4);
@@ -195,11 +213,83 @@ body {
   background: rgba(0,0,0,0.02);
 }
 
-/* Settings grid */
-#settingsGrid {
+/* Grid layout for preview and settings */
+.main-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(12, 1fr);
+  gap: var(--space-6);
+}
+
+.video-section {
+  grid-column: span 8;
+}
+
+.settings-section {
+  grid-column: span 4;
+}
+
+@media (max-width: 992px) {
+  .video-section,
+  .settings-section {
+    grid-column: span 6;
+  }
+}
+
+@media (max-width: 767px) {
+  .main-grid {
+    grid-template-columns: 1fr;
+  }
+  .video-section,
+  .settings-section {
+    grid-column: auto;
+  }
+}
+
+/* Video preview toolbar */
+.preview-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
   gap: var(--space-4);
+}
+
+.info-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.info-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px var(--space-3);
+  font-size: var(--font-xs);
+  background: var(--color-secondary);
+  border-radius: var(--radius-full);
+  color: var(--color-text);
+}
+
+/* Settings grid */
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-4);
+}
+
+@media (max-width: 767px) {
+  .settings-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Header avatar */
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  background: var(--color-secondary);
+  border: 1px solid var(--color-border);
 }
 
 /* Video preview */
