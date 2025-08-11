@@ -55,7 +55,7 @@ class SpritesheetGenerator {
         this.videoInfo = document.getElementById('videoInfo');
         this.videoDuration = document.getElementById('videoDuration');
         this.videoResolution = document.getElementById('videoResolution');
-        this.videoFrameRate = document.getElementById('videoFrameRate');
+        this.videoAspectRatioEl = document.getElementById('videoAspectRatio');
         this.videoCanvas = document.getElementById('videoCanvas');
         this.videoTransparentBgToggle = document.getElementById('videoTransparentBgToggle');
         if (this.videoCanvas) {
@@ -67,6 +67,7 @@ class SpritesheetGenerator {
         this.settingsHelp = document.getElementById('settingsHelp');
         this.settingsGrid = document.getElementById('settingsGrid');
         this.fpsSlider = document.getElementById('fpsSlider');
+        this.fpsInput = document.getElementById('fpsInput');
         this.fpsValue = document.getElementById('fpsValue');
         this.resolutionSelect = document.getElementById('resolutionSelect');
         this.customResolutionGroup = document.getElementById('customResolutionGroup');
@@ -203,10 +204,17 @@ class SpritesheetGenerator {
         }
 
         // Settings listeners
-        if (this.fpsSlider) {
-            this.fpsSlider.addEventListener('input', (e) => {
-                this.fpsValue.textContent = e.target.value;
-            });
+        if (this.fpsSlider && this.fpsInput) {
+            const updateFps = (val) => {
+                val = Math.min(120, Math.max(24, parseInt(val, 10) || 30));
+                this.fpsSlider.value = val;
+                this.fpsInput.value = val;
+                if (this.fpsValue) {
+                    this.fpsValue.textContent = val;
+                }
+            };
+            this.fpsSlider.addEventListener('input', (e) => updateFps(e.target.value));
+            this.fpsInput.addEventListener('input', (e) => updateFps(e.target.value));
         }
 
         // Update export button text based on format
@@ -397,6 +405,9 @@ class SpritesheetGenerator {
     loadDefaultSettings() {
         if (this.fpsSlider) {
             this.fpsSlider.value = 30;
+        }
+        if (this.fpsInput) {
+            this.fpsInput.value = 30;
         }
         if (this.fpsValue) {
             this.fpsValue.textContent = '30';
@@ -618,8 +629,8 @@ class SpritesheetGenerator {
         if (this.videoResolution) {
             this.videoResolution.textContent = `Resolution: ${video.videoWidth}×${video.videoHeight}`;
         }
-        if (this.videoFrameRate) {
-            this.videoFrameRate.textContent = `Aspect Ratio: ${this.videoAspectRatio.toFixed(3)}`;
+        if (this.videoAspectRatioEl) {
+            this.videoAspectRatioEl.textContent = `Aspect Ratio: ${this.videoAspectRatio.toFixed(3)}`;
         }
 
         // Show video section
