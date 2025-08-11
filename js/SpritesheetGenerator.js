@@ -70,11 +70,12 @@ class SpritesheetGenerator {
         this.fpsInput = document.getElementById('fpsInput');
         this.fpsValue = document.getElementById('fpsValue');
         this.resolutionSelect = document.getElementById('resolutionSelect');
+        this.resolutionPills = document.querySelectorAll('#resolutionPills .resolution-pill');
         this.customResolutionGroup = document.getElementById('customResolutionGroup');
         this.customWidth = document.getElementById('customWidth');
         this.customHeight = document.getElementById('customHeight');
         this.aspectRatioInfo = document.getElementById('aspectRatioInfo');
-        this.gridModeSelect = document.getElementById('gridModeSelect');
+        this.gridModeRadios = document.querySelectorAll('input[name="gridMode"]');
         this.customColumnsGroup = document.getElementById('customColumnsGroup');
         this.customColumns = document.getElementById('customColumns');
         this.filenameInput = document.getElementById('filenameInput');
@@ -135,6 +136,8 @@ class SpritesheetGenerator {
         // Time range elements
         this.startTime = document.getElementById('startTime');
         this.endTime = document.getElementById('endTime');
+        this.startRange = document.getElementById('startRange');
+        this.endRange = document.getElementById('endRange');
         this.timeRangeInfo = document.getElementById('timeRangeInfo');
 
         // Add these lines in initializeElements() after existing elements
@@ -227,13 +230,14 @@ class SpritesheetGenerator {
 
 
         if (this.resolutionSelect) {
-            this.resolutionSelect.addEventListener('change', (e) => {
-                if (e.target.value === 'custom') {
-                    this.customResolutionGroup.classList.remove('hidden');
-                    this.updateCustomResolutionInfo();
-                } else {
-                    this.customResolutionGroup.classList.add('hidden');
-                }
+            this.resolutionSelect.addEventListener('change', () => this.updateResolutionUI());
+        }
+        if (this.resolutionPills && this.resolutionSelect) {
+            this.resolutionPills.forEach(pill => {
+                pill.addEventListener('click', () => {
+                    this.resolutionSelect.value = pill.dataset.value;
+                    this.updateResolutionUI();
+                });
             });
         }
 
@@ -245,13 +249,9 @@ class SpritesheetGenerator {
             this.customHeight.addEventListener('input', () => this.updateCustomResolutionInfo());
         }
 
-        if (this.gridModeSelect) {
-            this.gridModeSelect.addEventListener('change', (e) => {
-                if (e.target.value === 'custom') {
-                    this.customColumnsGroup.classList.remove('hidden');
-                } else {
-                    this.customColumnsGroup.classList.add('hidden');
-                }
+        if (this.gridModeRadios) {
+            this.gridModeRadios.forEach(radio => {
+                radio.addEventListener('change', () => this.updateGridModeUI());
             });
         }
 
@@ -356,13 +356,31 @@ class SpritesheetGenerator {
             this.exportBtn.addEventListener('click', () => this.exportSpritesheet());
         }
 
-        // Add these listeners in setupEventListeners() after the existing listeners
+        // Time range listeners
         if (this.startTime) {
-            this.startTime.addEventListener('input', () => this.updateTimeRangeInfo());
+            this.startTime.addEventListener('input', () => {
+                if (this.startRange) this.startRange.value = this.startTime.value || 0;
+                this.updateTimeRangeInfo();
+            });
         }
 
         if (this.endTime) {
-            this.endTime.addEventListener('input', () => this.updateTimeRangeInfo());
+            this.endTime.addEventListener('input', () => {
+                if (this.endRange) this.endRange.value = this.endTime.value || this.endRange.max;
+                this.updateTimeRangeInfo();
+            });
+        }
+        if (this.startRange) {
+            this.startRange.addEventListener('input', () => {
+                if (this.startTime) this.startTime.value = this.startRange.value;
+                this.updateTimeRangeInfo();
+            });
+        }
+        if (this.endRange) {
+            this.endRange.addEventListener('input', () => {
+                if (this.endTime) this.endTime.value = this.endRange.value;
+                this.updateTimeRangeInfo();
+            });
         }
 
         // Add these listeners in setupEventListeners()
@@ -415,12 +433,14 @@ class SpritesheetGenerator {
         if (this.resolutionSelect) {
             this.resolutionSelect.value = 'same';
         }
-        if (this.gridModeSelect) {
-            this.gridModeSelect.value = 'auto';
+        if (this.gridModeRadios) {
+            this.gridModeRadios.forEach(r => r.checked = r.value === 'columns');
         }
         if (this.filenameInput) {
             this.filenameInput.value = 'spritesheet';
         }
+        this.updateResolutionUI();
+        this.updateGridModeUI();
     }
 
     updateCompressionInfo() {
@@ -454,7 +474,37 @@ class SpritesheetGenerator {
     this.compressionInfo.classList.toggle('compression-warning', isWarning);
 }
 
-    
+    updateResolutionUI() {
+    if (!this.resolutionSelect) return;
+    const value = this.resolutionSelect.value;
+    if (this.resolutionPills) {
+        this.resolutionPills.forEach(p => p.classList.toggle('active', p.dataset.value === value));
+    }
+    if (this.customResolutionGroup) {
+        if (value === 'custom') {
+            this.customResolutionGroup.classList.remove('hidden');
+            this.updateCustomResolutionInfo();
+        } else {
+            this.customResolutionGroup.classList.add('hidden');
+        }
+    }
+    }
+
+    getGridModeValue() {
+    const selected = document.querySelector('input[name="gridMode"]:checked');
+    return selected ? selected.value : 'auto';
+    }
+
+    updateGridModeUI() {
+    const mode = this.getGridModeValue();
+    if (this.customColumnsGroup) {
+        if (mode === 'custom') {
+            this.customColumnsGroup.classList.remove('hidden');
+        } else {
+            this.customColumnsGroup.classList.add('hidden');
+        }
+    }
+    }
 
     updateTimeRangeInfo() {
     if (!this.videoPlayer || !this.videoPlayer.duration || !this.timeRangeInfo) return;
@@ -654,6 +704,7 @@ class SpritesheetGenerator {
             this.customHeight.placeholder = 'Auto';
         }
 
+        this.updateResolutionUI();
 
         // Initialize time range inputs
         if (this.startTime) {
@@ -664,6 +715,14 @@ class SpritesheetGenerator {
             this.endTime.value = '';
             this.endTime.placeholder = video.duration.toFixed(1);
             this.endTime.max = video.duration.toFixed(1);
+        }
+        if (this.startRange) {
+            this.startRange.value = '0';
+            this.startRange.max = video.duration.toFixed(1);
+        }
+        if (this.endRange) {
+            this.endRange.value = video.duration.toFixed(1);
+            this.endRange.max = video.duration.toFixed(1);
         }
 
         // Update time range info
@@ -774,7 +833,7 @@ class SpritesheetGenerator {
             totalDuration: video.duration,
             startTime: startTime,
             endTime: endTime,
-            gridMode: this.gridModeSelect ? this.gridModeSelect.value : 'auto',
+            gridMode: this.getGridModeValue(),
             customColumns: parseInt(this.customColumns ? this.customColumns.value : 4),
             filename: (this.filenameInput ? this.filenameInput.value : 'spritesheet') || 'spritesheet',
             // Add compression settings
